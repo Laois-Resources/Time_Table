@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Weekly Schedule</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div>
+
+            <h1 id="appTitle">
+                Weekly Schedule
+            </h1>
+
+            <p id="appSubtitle">
+                Your weekly timetable
+            </p>
+
+        </div>
+
+
+        <div class="header-buttons">
+
+            <button
+                id="languageBtn"
+                class="secondary-btn"
+            >
+                العربية
+            </button>
+
+
+            <button
+                id="themeBtn"
+                class="secondary-btn"
+            >
+                ◐
+            </button>
+
+
+            <button
+                id="addEventBtn"
+                class="primary-btn"
+            >
+                + <span data-i18n="addEvent">
+                    Add Event
+                </span>
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- WEEK CONTROLS -->
+
+    <div class="controls">
+
+        <button
+            id="previousWeek"
+            class="secondary-btn"
+        >
+            ‹
+            <span data-i18n="previous">
+                Previous
+            </span>
+        </button>
+
+
+        <button
+            id="todayBtn"
+            class="secondary-btn"
+            data-i18n="today"
+        >
+            Today
+        </button>
+
+
+        <button
+            id="nextWeek"
+            class="secondary-btn"
+        >
+            <span data-i18n="next">
+                Next
+            </span>
+            ›
+        </button>
+
+
+        <div
+            id="weekLabel"
+            class="week-label"
+        ></div>
+
+    </div>
+
+
+    <!-- SCHEDULE -->
+
+    <main>
+
+        <div
+            id="scheduleContainer"
+            class="schedule-container"
+        ></div>
+
+
+        <div
+            id="emptyState"
+            class="empty-state"
+        >
+
+            <div class="empty-icon">
+                📅
+            </div>
+
+            <h2 data-i18n="emptyTitle">
+                Your schedule is empty
+            </h2>
+
+            <p data-i18n="emptyText">
+                Click a time slot or Add Event to begin.
+            </p>
+
+            <button
+                id="emptyAddBtn"
+                class="primary-btn"
+                data-i18n="addEvent"
+            >
+                Add Event
+            </button>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- EVENT MODAL -->
+
+<div
+    id="modalBackdrop"
+    class="modal-backdrop"
+>
+
+    <form
+        id="eventForm"
+        class="modal"
+    >
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="modalTitle">
+                    New Event
+                </h2>
+
+                <p data-i18n="eventHint">
+                    Add your schedule details.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="closeModal"
+                class="close-btn"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <input
+            type="hidden"
+            id="eventId"
+        >
+
+
+        <label>
+
+            <span data-i18n="eventName">
+                Event / Subject
+            </span>
+
+            <input
+                type="text"
+                id="titleInput"
+                placeholder="e.g. Lecture"
+                required
+                maxlength="80"
+            >
+
+        </label>
+
+
+        <label>
+
+            <span data-i18n="day">
+                Day
+            </span>
+
+            <select id="dayInput"></select>
+
+        </label>
+
+
+        <div class="two-columns">
+
+            <label>
+
+                <span data-i18n="start">
+                    Start
+                </span>
+
+                <input
+                    type="time"
+                    id="startInput"
+                    required
+                >
+
+            </label>
+
+
+            <label>
+
+                <span data-i18n="end">
+                    End
+                </span>
+
+                <input
+                    type="time"
+                    id="endInput"
+                    required
+                >
+
+            </label>
+
+        </div>
+
+
+        <label>
+
+            <span data-i18n="location">
+                Location
+            </span>
+
+            <input
+                type="text"
+                id="locationInput"
+                placeholder="e.g. Room 204"
+                maxlength="100"
+            >
+
+        </label>
+
+
+        <label>
+
+            <span data-i18n="notes">
+                Notes
+            </span>
+
+            <textarea
+                id="notesInput"
+                rows="3"
+                placeholder="Optional"
+                maxlength="250"
+            ></textarea>
+
+        </label>
+
+
+        <label>
+
+            <span data-i18n="color">
+                Color
+            </span>
+
+            <div
+                id="colorRow"
+                class="color-row"
+            ></div>
+
+        </label>
+
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                id="deleteBtn"
+                class="delete-btn"
+            >
+                <span data-i18n="delete">
+                    Delete
+                </span>
+            </button>
+
+
+            <div>
+
+                <button
+                    type="button"
+                    id="cancelBtn"
+                    class="secondary-btn"
+                    data-i18n="cancel"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                    data-i18n="save"
+                >
+                    Save
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- MESSAGE -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
