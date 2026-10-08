@@ -1,6 +1,6 @@
 /* =========================================
-   WEEKLY TIMETABLE
-   LocalStorage + Repeat System
+   WEEKLY PLANNER
+   Table + LocalStorage + Repeat
 ========================================= */
 
 
@@ -8,8 +8,24 @@
    STORAGE
 ========================================= */
 
-const STORAGE_KEY = "weeklyTimetableEvents";
-const SETTINGS_KEY = "weeklyTimetableSettings";
+const STORAGE_KEY =
+    "weeklyPlannerTasks";
+
+const SETTINGS_KEY =
+    "weeklyPlannerSettings";
+
+
+/* =========================================
+   STATE
+========================================= */
+
+let tasks = [];
+
+let currentLanguage = "en";
+
+let darkMode = false;
+
+let weekOffset = 0;
 
 
 /* =========================================
@@ -20,111 +36,129 @@ const translations = {
 
     en: {
 
-        title: "Weekly Timetable",
-        subtitle: "Your simple weekly schedule",
+        title: "Weekly Planner",
 
-        addEvent: "Add Event",
+        subtitle:
+            "Organise what you need to do each week.",
 
-        previous: "Previous",
+        add: "Add",
+
+        previous: "← Previous",
+
         today: "Today",
-        next: "Next",
 
-        time: "Time",
+        next: "Next →",
 
-        addEventTitle: "Add Event",
-        editEventTitle: "Edit Event",
+        thisWeek: "This Week",
 
-        eventClass: "Event / Class",
         day: "Day",
 
-        start: "Start",
-        end: "End",
+        task: "What to do",
+
+        time: "Time",
 
         location: "Location",
 
         repeat: "Repeat",
 
-        everyWeek: "Every week",
-        onceOnly: "Once only",
-
-        colour: "Colour",
         notes: "Notes",
 
-        notesPlaceholder: "Optional notes...",
+        actions: "Actions",
 
-        save: "Save",
-        cancel: "Cancel",
-        delete: "Delete",
+        noTasks:
+            "No tasks added yet.",
 
-        tableHint:
-            "Click an empty time slot to add an event.",
+        addTask:
+            "Add Task",
 
-        weekly:
-            "Weekly",
+        editTask:
+            "Edit Task",
 
-        conflict:
-            "This time overlaps with another event.",
+        taskQuestion:
+            "What do you need to do?",
+
+        startTime:
+            "Start time",
+
+        endTime:
+            "End time",
+
+        everyWeek:
+            "Every week",
+
+        once:
+            "Once only",
+
+        optional:
+            "Optional notes...",
+
+        save:
+            "Save",
+
+        cancel:
+            "Cancel",
+
+        delete:
+            "Delete",
+
+        edit:
+            "Edit",
+
+        confirmDelete:
+            "Are you sure you want to delete this task?",
+
+        saved:
+            "Task saved.",
+
+        deleted:
+            "Task deleted.",
 
         invalidTime:
             "End time must be after start time.",
 
-        deleted:
-            "Event deleted.",
+        conflict:
+            "This task overlaps another task.",
 
-        saved:
-            "Event saved.",
+        locationPlaceholder:
+            "e.g. Room 204",
 
-        confirmDelete:
-            "Are you sure you want to delete this event?",
-
-        noEvents:
-            "No events",
-
-        repeatBadge:
-            "Every week"
+        taskPlaceholder:
+            "e.g. Test, Meeting, Assignment..."
 
     },
 
 
     ar: {
 
-        title: "الجدول الأسبوعي",
+        title:
+            "المخطط الأسبوعي",
 
         subtitle:
-            "جدولك الأسبوعي البسيط",
+            "نظّم الأشياء التي تحتاج إلى القيام بها كل أسبوع.",
 
-        addEvent:
-            "إضافة حدث",
+        add:
+            "إضافة",
 
         previous:
-            "السابق",
+            "← السابق",
 
         today:
             "اليوم",
 
         next:
-            "التالي",
+            "التالي →",
 
-        time:
-            "الوقت",
-
-        addEventTitle:
-            "إضافة حدث",
-
-        editEventTitle:
-            "تعديل الحدث",
-
-        eventClass:
-            "الحدث / المادة",
+        thisWeek:
+            "هذا الأسبوع",
 
         day:
             "اليوم",
 
-        start:
-            "البداية",
+        task:
+            "ماذا تريد أن تفعل؟",
 
-        end:
-            "النهاية",
+        time:
+            "الوقت",
 
         location:
             "الموقع",
@@ -132,19 +166,37 @@ const translations = {
         repeat:
             "التكرار",
 
-        everyWeek:
-            "كل أسبوع",
-
-        onceOnly:
-            "مرة واحدة",
-
-        colour:
-            "اللون",
-
         notes:
             "ملاحظات",
 
-        notesPlaceholder:
+        actions:
+            "الإجراءات",
+
+        noTasks:
+            "لم تتم إضافة أي مهام بعد.",
+
+        addTask:
+            "إضافة مهمة",
+
+        editTask:
+            "تعديل المهمة",
+
+        taskQuestion:
+            "ماذا تريد أن تفعل؟",
+
+        startTime:
+            "وقت البداية",
+
+        endTime:
+            "وقت النهاية",
+
+        everyWeek:
+            "كل أسبوع",
+
+        once:
+            "مرة واحدة",
+
+        optional:
             "ملاحظات اختيارية...",
 
         save:
@@ -156,33 +208,29 @@ const translations = {
         delete:
             "حذف",
 
-        tableHint:
-            "اضغط على خانة زمنية فارغة لإضافة حدث.",
+        edit:
+            "تعديل",
 
-        weekly:
-            "أسبوعي",
+        confirmDelete:
+            "هل أنت متأكد أنك تريد حذف هذه المهمة؟",
 
-        conflict:
-            "هذا الوقت يتداخل مع حدث آخر.",
+        saved:
+            "تم حفظ المهمة.",
+
+        deleted:
+            "تم حذف المهمة.",
 
         invalidTime:
             "يجب أن يكون وقت النهاية بعد وقت البداية.",
 
-        deleted:
-            "تم حذف الحدث.",
+        conflict:
+            "هذه المهمة تتداخل مع مهمة أخرى.",
 
-        saved:
-            "تم حفظ الحدث.",
+        locationPlaceholder:
+            "مثال: الغرفة 204",
 
-        confirmDelete:
-            "هل أنت متأكد أنك تريد حذف هذا الحدث؟",
-
-        noEvents:
-            "لا توجد أحداث",
-
-        repeatBadge:
-            "كل أسبوع"
-
+        taskPlaceholder:
+            "مثال: اختبار، اجتماع، واجب..."
     }
 
 };
@@ -218,112 +266,129 @@ const days = {
 
 
 /* =========================================
-   APP STATE
-========================================= */
-
-let events = [];
-
-let currentLanguage = "en";
-
-let darkMode = false;
-
-let weekOffset = 0;
-
-
-/* =========================================
    DOM
 ========================================= */
 
-const scheduleBody =
-    document.getElementById("scheduleBody");
+const tableBody =
+    document.getElementById(
+        "taskTableBody"
+    );
 
-const eventModal =
-    document.getElementById("eventModal");
+const emptyMessage =
+    document.getElementById(
+        "emptyMessage"
+    );
 
-const eventForm =
-    document.getElementById("eventForm");
+const modal =
+    document.getElementById(
+        "modal"
+    );
 
-const eventId =
-    document.getElementById("eventId");
+const form =
+    document.getElementById(
+        "taskForm"
+    );
 
-const eventTitle =
-    document.getElementById("eventTitle");
+const taskId =
+    document.getElementById(
+        "taskId"
+    );
 
-const eventDay =
-    document.getElementById("eventDay");
+const taskDay =
+    document.getElementById(
+        "taskDay"
+    );
 
-const eventStart =
-    document.getElementById("eventStart");
+const taskTitle =
+    document.getElementById(
+        "taskTitle"
+    );
 
-const eventEnd =
-    document.getElementById("eventEnd");
+const taskStart =
+    document.getElementById(
+        "taskStart"
+    );
 
-const eventLocation =
-    document.getElementById("eventLocation");
+const taskEnd =
+    document.getElementById(
+        "taskEnd"
+    );
 
-const eventRepeat =
-    document.getElementById("eventRepeat");
+const taskLocation =
+    document.getElementById(
+        "taskLocation"
+    );
 
-const eventColor =
-    document.getElementById("eventColor");
+const taskRepeat =
+    document.getElementById(
+        "taskRepeat"
+    );
 
-const eventNotes =
-    document.getElementById("eventNotes");
-
-const deleteEventBtn =
-    document.getElementById("deleteEventBtn");
+const taskNotes =
+    document.getElementById(
+        "taskNotes"
+    );
 
 const modalTitle =
-    document.getElementById("modalTitle");
+    document.getElementById(
+        "modalTitle"
+    );
+
+const deleteBtn =
+    document.getElementById(
+        "deleteBtn"
+    );
 
 const weekLabel =
-    document.getElementById("weekLabel");
+    document.getElementById(
+        "weekLabel"
+    );
 
 const toast =
-    document.getElementById("toast");
+    document.getElementById(
+        "toast"
+    );
 
 
 /* =========================================
-   LOAD DATA
+   LOAD
 ========================================= */
 
 function loadData() {
 
     try {
 
-        const storedEvents =
-            localStorage.getItem(STORAGE_KEY);
+        const savedTasks =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
 
-        if (storedEvents) {
-
-            events = JSON.parse(storedEvents);
-
-        } else {
-
-            events = [];
-
-        }
+        tasks =
+            savedTasks
+                ? JSON.parse(savedTasks)
+                : [];
 
     } catch (error) {
 
-        console.error(
-            "Could not load events:",
-            error
-        );
+        console.error(error);
 
-        events = [];
+        tasks = [];
     }
 
 
     try {
 
-        const storedSettings =
-            localStorage.getItem(SETTINGS_KEY);
+        const savedSettings =
+            localStorage.getItem(
+                SETTINGS_KEY
+            );
 
-        if (storedSettings) {
+        if (savedSettings) {
 
             const settings =
-                JSON.parse(storedSettings);
+                JSON.parse(
+                    savedSettings
+                );
 
             currentLanguage =
                 settings.language || "en";
@@ -334,10 +399,7 @@ function loadData() {
 
     } catch (error) {
 
-        console.error(
-            "Could not load settings:",
-            error
-        );
+        console.error(error);
     }
 
 
@@ -346,21 +408,17 @@ function loadData() {
 
 
 /* =========================================
-   SAVE EVENTS
+   SAVE
 ========================================= */
 
-function saveEvents() {
+function saveTasks() {
 
     localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify(events)
+        JSON.stringify(tasks)
     );
 }
 
-
-/* =========================================
-   SAVE SETTINGS
-========================================= */
 
 function saveSettings() {
 
@@ -368,9 +426,11 @@ function saveSettings() {
         SETTINGS_KEY,
         JSON.stringify({
 
-            language: currentLanguage,
+            language:
+                currentLanguage,
 
-            darkMode: darkMode
+            darkMode:
+                darkMode
 
         })
     );
@@ -384,7 +444,9 @@ function saveSettings() {
 function applySettings() {
 
     const t =
-        translations[currentLanguage];
+        translations[
+            currentLanguage
+        ];
 
 
     document.documentElement.lang =
@@ -403,268 +465,791 @@ function applySettings() {
     );
 
 
-    document.getElementById("appTitle").textContent =
+    document.getElementById(
+        "appTitle"
+    ).textContent =
         t.title;
 
-    document.getElementById("appSubtitle").textContent =
+
+    document.getElementById(
+        "appSubtitle"
+    ).textContent =
         t.subtitle;
 
-    document.getElementById("addEventText").textContent =
-        t.addEvent;
 
-    document.getElementById("previousText").textContent =
+    document.getElementById(
+        "addBtn"
+    ).textContent =
+        "+ " + t.add;
+
+
+    document.getElementById(
+        "previousWeekBtn"
+    ).textContent =
         t.previous;
 
-    document.getElementById("todayText").textContent =
+
+    document.getElementById(
+        "todayBtn"
+    ).textContent =
         t.today;
 
-    document.getElementById("nextText").textContent =
+
+    document.getElementById(
+        "nextWeekBtn"
+    ).textContent =
         t.next;
 
-    document.getElementById("timeHeader").textContent =
-        t.time;
 
-    document.getElementById("tableHint").textContent =
-        t.tableHint;
-
-    document.getElementById("titleLabel").textContent =
-        t.eventClass;
-
-    document.getElementById("dayLabel").textContent =
-        t.day;
-
-    document.getElementById("startLabel").textContent =
-        t.start;
-
-    document.getElementById("endLabel").textContent =
-        t.end;
-
-    document.getElementById("locationLabel").textContent =
-        t.location;
-
-    document.getElementById("repeatLabel").textContent =
-        t.repeat;
-
-    document.getElementById("colorLabel").textContent =
-        t.colour;
-
-    document.getElementById("notesLabel").textContent =
-        t.notes;
-
-    document.getElementById("saveText").textContent =
-        t.save;
-
-    document.getElementById("cancelBtn").textContent =
-        t.cancel;
-
-    document.getElementById("deleteEventBtn").textContent =
-        t.delete;
-
-
-    document.getElementById("languageBtn").textContent =
+    document.getElementById(
+        "languageBtn"
+    ).textContent =
         currentLanguage === "en"
             ? "العربية"
             : "English";
 
 
-    document.getElementById("themeBtn").textContent =
+    document.getElementById(
+        "themeBtn"
+    ).textContent =
         darkMode
             ? "☀️"
             : "🌙";
 
 
-    eventTitle.placeholder =
-        currentLanguage === "en"
-            ? "e.g. Web Development"
-            : "مثال: تطوير الويب";
+    updateTableHeaders();
+
+    updateFormText();
+
+    updateWeekLabel();
+
+    renderTable();
+}
 
 
-    eventLocation.placeholder =
-        currentLanguage === "en"
-            ? "e.g. Room 204"
-            : "مثال: الغرفة 204";
+/* =========================================
+   TABLE HEADERS
+========================================= */
+
+function updateTableHeaders() {
+
+    const headers =
+        document.querySelectorAll(
+            "thead th"
+        );
+
+    const t =
+        translations[
+            currentLanguage
+        ];
 
 
-    eventNotes.placeholder =
-        t.notesPlaceholder;
+    headers[0].textContent =
+        t.day;
+
+    headers[1].textContent =
+        t.task;
+
+    headers[2].textContent =
+        t.time;
+
+    headers[3].textContent =
+        t.location;
+
+    headers[4].textContent =
+        t.repeat;
+
+    headers[5].textContent =
+        t.notes;
+
+    headers[6].textContent =
+        t.actions;
+}
+
+
+/* =========================================
+   FORM TEXT
+========================================= */
+
+function updateFormText() {
+
+    const t =
+        translations[
+            currentLanguage
+        ];
+
+
+    document.querySelector(
+        'label[for="taskDay"]'
+    ).textContent =
+        t.day;
+
+
+    document.querySelector(
+        'label[for="taskTitle"]'
+    ).textContent =
+        t.taskQuestion;
+
+
+    document.querySelector(
+        'label[for="taskStart"]'
+    ).textContent =
+        t.startTime;
+
+
+    document.querySelector(
+        'label[for="taskEnd"]'
+    ).textContent =
+        t.endTime;
+
+
+    document.querySelector(
+        'label[for="taskLocation"]'
+    ).textContent =
+        t.location;
+
+
+    document.querySelector(
+        'label[for="taskRepeat"]'
+    ).textContent =
+        t.repeat;
+
+
+    document.querySelector(
+        'label[for="taskNotes"]'
+    ).textContent =
+        t.notes;
+
+
+    taskTitle.placeholder =
+        t.taskPlaceholder;
+
+
+    taskLocation.placeholder =
+        t.locationPlaceholder;
+
+
+    taskNotes.placeholder =
+        t.optional;
+
+
+    document.getElementById(
+        "cancelBtn"
+    ).textContent =
+        t.cancel;
+
+
+    document.getElementById(
+        "deleteBtn"
+    ).textContent =
+        t.delete;
 
 
     updateDayOptions();
 
     updateRepeatOptions();
-
-    updateWeekLabel();
-
-    renderSchedule();
 }
 
 
 /* =========================================
-   DAY OPTIONS
+   FORM OPTIONS
 ========================================= */
 
 function updateDayOptions() {
 
-    const currentValue =
-        eventDay.value;
+    const current =
+        taskDay.value;
 
-    eventDay.innerHTML = "";
-
-
-    days[currentLanguage].forEach(
-        (day, index) => {
-
-            const option =
-                document.createElement("option");
-
-            option.value = index;
-
-            option.textContent = day;
-
-            eventDay.appendChild(option);
-        }
-    );
+    taskDay.innerHTML = "";
 
 
-    if (currentValue !== "") {
+    days[currentLanguage]
+        .forEach(
+            (day, index) => {
 
-        eventDay.value =
-            currentValue;
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    index;
+
+                option.textContent =
+                    day;
+
+                taskDay.appendChild(
+                    option
+                );
+            }
+        );
+
+
+    if (current !== "") {
+
+        taskDay.value =
+            current;
     }
 }
 
 
-/* =========================================
-   REPEAT OPTIONS
-========================================= */
-
 function updateRepeatOptions() {
 
-    const currentValue =
-        eventRepeat.value || "weekly";
+    const current =
+        taskRepeat.value || "weekly";
 
-    eventRepeat.innerHTML = "";
+    const t =
+        translations[
+            currentLanguage
+        ];
 
 
-    const weeklyOption =
-        document.createElement("option");
+    taskRepeat.innerHTML = "";
 
-    weeklyOption.value =
+
+    const weekly =
+        document.createElement(
+            "option"
+        );
+
+    weekly.value =
         "weekly";
 
-    weeklyOption.textContent =
-        translations[currentLanguage].everyWeek;
+    weekly.textContent =
+        t.everyWeek;
 
 
-    const onceOption =
-        document.createElement("option");
+    const once =
+        document.createElement(
+            "option"
+        );
 
-    onceOption.value =
+    once.value =
         "once";
 
-    onceOption.textContent =
-        translations[currentLanguage].onceOnly;
+    once.textContent =
+        t.once;
 
 
-    eventRepeat.appendChild(
-        weeklyOption
+    taskRepeat.appendChild(
+        weekly
     );
 
-    eventRepeat.appendChild(
-        onceOption
+    taskRepeat.appendChild(
+        once
     );
 
 
-    eventRepeat.value =
-        currentValue;
+    taskRepeat.value =
+        current;
 }
 
 
 /* =========================================
-   WEEK FUNCTIONS
+   DATE HELPERS
 ========================================= */
 
 function getMonday(date) {
 
-    const d =
+    const result =
         new Date(date);
 
     const day =
-        d.getDay();
+        result.getDay();
+
 
     const difference =
         day === 0
             ? -6
             : 1 - day;
 
-    d.setDate(
-        d.getDate() + difference
+
+    result.setDate(
+        result.getDate() +
+        difference
     );
 
-    d.setHours(0, 0, 0, 0);
 
-    return d;
+    result.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    return result;
 }
 
 
-function getDisplayedWeekStart() {
-
-    const today =
-        new Date();
+function getCurrentWeekStart() {
 
     const monday =
-        getMonday(today);
+        getMonday(
+            new Date()
+        );
+
 
     monday.setDate(
         monday.getDate() +
-        (weekOffset * 7)
+        weekOffset * 7
     );
+
 
     return monday;
 }
 
 
-function formatDate(date) {
+function dateToString(date) {
 
-    return date.toLocaleDateString(
-        currentLanguage === "ar"
-            ? "ar-IQ"
-            : "en-IE",
-        {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        }
-    );
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2, "0");
+
+
+    return `${year}-${month}-${day}`;
 }
 
 
+/* =========================================
+   WEEK LABEL
+========================================= */
+
 function updateWeekLabel() {
 
+    const t =
+        translations[
+            currentLanguage
+        ];
+
+
+    if (weekOffset === 0) {
+
+        weekLabel.textContent =
+            t.thisWeek;
+
+        return;
+    }
+
+
     const start =
-        getDisplayedWeekStart();
+        getCurrentWeekStart();
+
 
     const end =
         new Date(start);
+
 
     end.setDate(
         end.getDate() + 6
     );
 
 
-    if (weekOffset === 0) {
+    const options = {
 
-        weekLabel.textContent =
-            currentLanguage === "en"
-                ? "This Week"
-                : "هذا الأسبوع";
+        day: "numeric",
 
-        return;
-    }
+        month: "short",
+
+        year: "numeric"
+
+    };
+
+
+    const startText =
+        start.toLocaleDateString(
+            currentLanguage === "ar"
+                ? "ar-IQ"
+                : "en-IE",
+            options
+        );
+
+
+    const endText =
+        end.toLocaleDateString(
+            currentLanguage === "ar"
+                ? "ar-IQ"
+                : "en-IE",
+            options
+        );
 
 
     weekLabel.textContent =
-        `${formatDate(start)} - ${formatDate(end)}`;
+        `${startText} - ${endText}`;
+}
+
+
+/* =========================================
+   VISIBLE TASKS
+========================================= */
+
+function getVisibleTasks() {
+
+    const weekStart =
+        getCurrentWeekStart();
+
+
+    const weekStartString =
+        dateToString(
+            weekStart
+        );
+
+
+    const weekEnd =
+        new Date(weekStart);
+
+
+    weekEnd.setDate(
+        weekEnd.getDate() + 6
+    );
+
+
+    const weekEndString =
+        dateToString(
+            weekEnd
+        );
+
+
+    return tasks.filter(
+        task => {
+
+            /*
+               WEEKLY:
+               Always appears on its
+               selected weekday.
+            */
+
+            if (
+                task.repeat === "weekly"
+            ) {
+
+                return true;
+            }
+
+
+            /*
+               ONCE:
+               Only appears during the
+               week it was created.
+            */
+
+            if (
+                task.repeat === "once"
+            ) {
+
+                return (
+                    task.date >=
+                    weekStartString &&
+
+                    task.date <=
+                    weekEndString
+                );
+            }
+
+
+            return false;
+        }
+    );
+}
+
+
+/* =========================================
+   SORT
+========================================= */
+
+function sortTasks(list) {
+
+    return [...list].sort(
+        (a, b) => {
+
+            if (
+                a.dayIndex !==
+                b.dayIndex
+            ) {
+
+                return (
+                    a.dayIndex -
+                    b.dayIndex
+                );
+            }
+
+
+            return (
+                timeToMinutes(a.start) -
+                timeToMinutes(b.start)
+            );
+        }
+    );
+}
+
+
+/* =========================================
+   RENDER TABLE
+========================================= */
+
+function renderTable() {
+
+    tableBody.innerHTML = "";
+
+
+    const visibleTasks =
+        sortTasks(
+            getVisibleTasks()
+        );
+
+
+    emptyMessage.classList.toggle(
+        "hidden",
+        visibleTasks.length > 0
+    );
+
+
+    visibleTasks.forEach(
+        task => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            /* DAY */
+
+            const dayCell =
+                document.createElement(
+                    "td"
+                );
+
+            dayCell.className =
+                "day-cell";
+
+            dayCell.textContent =
+                days[
+                    currentLanguage
+                ][
+                    task.dayIndex
+                ];
+
+
+            /* TASK */
+
+            const taskCell =
+                document.createElement(
+                    "td"
+                );
+
+            taskCell.className =
+                "task-name";
+
+            taskCell.textContent =
+                task.title;
+
+
+            /* TIME */
+
+            const timeCell =
+                document.createElement(
+                    "td"
+                );
+
+            timeCell.className =
+                "time-cell";
+
+            timeCell.textContent =
+                `${formatTime(task.start)}
+                 -
+                 ${formatTime(task.end)}`;
+
+
+            /* LOCATION */
+
+            const locationCell =
+                document.createElement(
+                    "td"
+                );
+
+            locationCell.className =
+                "location-cell";
+
+            locationCell.textContent =
+                task.location ||
+                "—";
+
+
+            /* REPEAT */
+
+            const repeatCell =
+                document.createElement(
+                    "td"
+                );
+
+
+            const repeatBadge =
+                document.createElement(
+                    "span"
+                );
+
+
+            repeatBadge.className =
+                task.repeat === "weekly"
+                    ? "repeat-badge repeat-weekly"
+                    : "repeat-badge repeat-once";
+
+
+            repeatBadge.textContent =
+                task.repeat === "weekly"
+                    ? translations[
+                        currentLanguage
+                      ].everyWeek
+                    : translations[
+                        currentLanguage
+                      ].once;
+
+
+            repeatCell.appendChild(
+                repeatBadge
+            );
+
+
+            /* NOTES */
+
+            const notesCell =
+                document.createElement(
+                    "td"
+                );
+
+            notesCell.className =
+                "notes-cell";
+
+            notesCell.textContent =
+                task.notes ||
+                "—";
+
+
+            /* ACTIONS */
+
+            const actionsCell =
+                document.createElement(
+                    "td"
+                );
+
+            const actions =
+                document.createElement(
+                    "div"
+                );
+
+            actions.className =
+                "actions";
+
+
+            const editButton =
+                document.createElement(
+                    "button"
+                );
+
+            editButton.className =
+                "action-btn";
+
+            editButton.textContent =
+                translations[
+                    currentLanguage
+                ].edit;
+
+
+            editButton.addEventListener(
+                "click",
+                () => {
+
+                    openEditModal(
+                        task.id
+                    );
+                }
+            );
+
+
+            const deleteButton =
+                document.createElement(
+                    "button"
+                );
+
+            deleteButton.className =
+                "action-btn action-delete";
+
+            deleteButton.textContent =
+                translations[
+                    currentLanguage
+                ].delete;
+
+
+            deleteButton.addEventListener(
+                "click",
+                () => {
+
+                    deleteTask(
+                        task.id
+                    );
+                }
+            );
+
+
+            actions.appendChild(
+                editButton
+            );
+
+            actions.appendChild(
+                deleteButton
+            );
+
+            actionsCell.appendChild(
+                actions
+            );
+
+
+            /* ADD CELLS */
+
+            row.appendChild(
+                dayCell
+            );
+
+            row.appendChild(
+                taskCell
+            );
+
+            row.appendChild(
+                timeCell
+            );
+
+            row.appendChild(
+                locationCell
+            );
+
+            row.appendChild(
+                repeatCell
+            );
+
+            row.appendChild(
+                notesCell
+            );
+
+            row.appendChild(
+                actionsCell
+            );
+
+
+            tableBody.appendChild(
+                row
+            );
+        }
+    );
 }
 
 
@@ -674,12 +1259,13 @@ function updateWeekLabel() {
 
 function timeToMinutes(time) {
 
-    const [hours, minutes] =
-        time.split(":").map(Number);
+    const parts =
+        time.split(":");
+
 
     return (
-        hours * 60 +
-        minutes
+        Number(parts[0]) * 60 +
+        Number(parts[1])
     );
 }
 
@@ -692,6 +1278,7 @@ function formatTime(time) {
 
     const date =
         new Date();
+
 
     date.setHours(
         hours,
@@ -715,521 +1302,101 @@ function formatTime(time) {
 
 
 /* =========================================
-   TIME SLOTS
+   OPEN ADD
 ========================================= */
 
-function createTimeSlots() {
+function openAddModal() {
 
-    const slots = [];
+    form.reset();
 
 
-    /*
-       06:00 -> 22:00
-       One row per hour.
-    */
+    taskId.value = "";
 
-    for (
-        let hour = 6;
-        hour <= 22;
-        hour++
-    ) {
+    taskDay.value = "0";
 
-        const time =
-            `${String(hour).padStart(2, "0")}:00`;
-
-        slots.push(time);
-    }
-
-
-    return slots;
-}
-
-
-/* =========================================
-   EVENT VISIBILITY
-========================================= */
-
-function eventBelongsToCurrentWeek(
-    event
-) {
-
-    /*
-       WEEKLY EVENT:
-       Appears every week on its dayIndex.
-
-       ONCE EVENT:
-       Appears only during the week
-       where it was originally created.
-    */
-
-
-    if (event.repeat === "weekly") {
-
-        return true;
-    }
-
-
-    if (!event.date) {
-
-        return false;
-    }
-
-
-    const eventDate =
-        new Date(
-            event.date + "T00:00:00"
-        );
-
-
-    const weekStart =
-        getDisplayedWeekStart();
-
-
-    const weekEnd =
-        new Date(weekStart);
-
-    weekEnd.setDate(
-        weekEnd.getDate() + 6
-    );
-
-
-    return (
-        eventDate >= weekStart &&
-        eventDate <= weekEnd
-    );
-}
-
-
-/* =========================================
-   EVENT DATE
-========================================= */
-
-function getDateString(date) {
-
-    const year =
-        date.getFullYear();
-
-    const month =
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0");
-
-    const day =
-        String(
-            date.getDate()
-        ).padStart(2, "0");
-
-
-    return `${year}-${month}-${day}`;
-}
-
-
-/* =========================================
-   GET VISIBLE EVENTS
-========================================= */
-
-function getVisibleEvents() {
-
-    return events.filter(
-        event =>
-            eventBelongsToCurrentWeek(
-                event
-            )
-    );
-}
-
-
-/* =========================================
-   RENDER TABLE
-========================================= */
-
-function renderSchedule() {
-
-    scheduleBody.innerHTML = "";
-
-
-    const timeSlots =
-        createTimeSlots();
-
-
-    const visibleEvents =
-        getVisibleEvents();
-
-
-    timeSlots.forEach(
-        time => {
-
-            const row =
-                document.createElement("tr");
-
-
-            /* TIME CELL */
-
-            const timeCell =
-                document.createElement("td");
-
-            timeCell.className =
-                "time-cell";
-
-            timeCell.textContent =
-                formatTime(time);
-
-            row.appendChild(
-                timeCell
-            );
-
-
-            /* DAY CELLS */
-
-            for (
-                let dayIndex = 0;
-                dayIndex < 7;
-                dayIndex++
-            ) {
-
-                const cell =
-                    document.createElement("td");
-
-                cell.className =
-                    "schedule-cell";
-
-                cell.dataset.day =
-                    dayIndex;
-
-                cell.dataset.time =
-                    time;
-
-
-                cell.addEventListener(
-                    "click",
-                    () => {
-
-                        openAddModal(
-                            dayIndex,
-                            time
-                        );
-                    }
-                );
-
-
-                /*
-                   Find event beginning at
-                   this exact hour.
-                */
-
-                const cellEvents =
-                    visibleEvents.filter(
-                        event =>
-
-                            Number(
-                                event.dayIndex
-                            ) === dayIndex &&
-
-                            event.start === time
-                    );
-
-
-                cellEvents.forEach(
-                    event => {
-
-                        const eventElement =
-                            createEventElement(
-                                event
-                            );
-
-                        cell.appendChild(
-                            eventElement
-                        );
-                    }
-                );
-
-
-                row.appendChild(
-                    cell
-                );
-            }
-
-
-            scheduleBody.appendChild(
-                row
-            );
-        }
-    );
-
-
-    updateDayHeaderDates();
-}
-
-
-/* =========================================
-   EVENT ELEMENT
-========================================= */
-
-function createEventElement(
-    event
-) {
-
-    const element =
-        document.createElement("div");
-
-    element.className =
-        "event";
-
-
-    element.style.background =
-        event.color || "#4f46e5";
-
-
-    const title =
-        document.createElement("div");
-
-    title.className =
-        "event-title";
-
-    title.textContent =
-        event.title;
-
-
-    const time =
-        document.createElement("div");
-
-    time.className =
-        "event-time";
-
-    time.textContent =
-        `${formatTime(event.start)} - ${formatTime(event.end)}`;
-
-
-    element.appendChild(
-        title
-    );
-
-    element.appendChild(
-        time
-    );
-
-
-    if (event.location) {
-
-        const location =
-            document.createElement("div");
-
-        location.className =
-            "event-location";
-
-        location.textContent =
-            `📍 ${event.location}`;
-
-        element.appendChild(
-            location
-        );
-    }
-
-
-    if (event.repeat === "weekly") {
-
-        const repeat =
-            document.createElement("div");
-
-        repeat.className =
-            "event-repeat";
-
-        repeat.textContent =
-            `↻ ${
-                translations[
-                    currentLanguage
-                ].repeatBadge
-            }`;
-
-        element.appendChild(
-            repeat
-        );
-    }
-
-
-    element.addEventListener(
-        "click",
-        eventObject => {
-
-            eventObject.stopPropagation();
-
-            openEditModal(
-                event.id
-            );
-        }
-    );
-
-
-    return element;
-}
-
-
-/* =========================================
-   DAY HEADER DATES
-========================================= */
-
-function updateDayHeaderDates() {
-
-    const start =
-        getDisplayedWeekStart();
-
-
-    document
-        .querySelectorAll(".day-name")
-        .forEach(
-            (element, index) => {
-
-                const date =
-                    new Date(start);
-
-                date.setDate(
-                    date.getDate() + index
-                );
-
-
-                const dayName =
-                    days[
-                        currentLanguage
-                    ][index];
-
-
-                element.textContent =
-                    `${dayName} ${date.getDate()}/${date.getMonth() + 1}`;
-            }
-        );
-}
-
-
-/* =========================================
-   OPEN ADD MODAL
-========================================= */
-
-function openAddModal(
-    dayIndex = 0,
-    startTime = "09:00"
-) {
-
-    eventForm.reset();
-
-
-    eventId.value = "";
-
-    eventDay.value =
-        dayIndex;
-
-    eventStart.value =
-        startTime;
-
-
-    const hour =
-        Number(
-            startTime.split(":")[0]
-        );
-
-
-    const endHour =
-        Math.min(
-            hour + 1,
-            23
-        );
-
-
-    eventEnd.value =
-        `${String(endHour).padStart(2, "0")}:00`;
-
-
-    eventRepeat.value =
+    taskRepeat.value =
         "weekly";
-
-
-    eventColor.value =
-        "#4f46e5";
 
 
     modalTitle.textContent =
         translations[
             currentLanguage
-        ].addEventTitle;
+        ].addTask;
 
 
-    deleteEventBtn.classList.add(
+    deleteBtn.classList.add(
         "hidden"
     );
 
 
-    eventModal.classList.remove(
+    modal.classList.remove(
         "hidden"
     );
 
 
     setTimeout(
-        () => eventTitle.focus(),
+        () => taskTitle.focus(),
         100
     );
 }
 
 
 /* =========================================
-   OPEN EDIT MODAL
+   OPEN EDIT
 ========================================= */
 
-function openEditModal(
-    id
-) {
+function openEditModal(id) {
 
-    const event =
-        events.find(
+    const task =
+        tasks.find(
             item =>
                 item.id === id
         );
 
 
-    if (!event) {
+    if (!task) {
 
         return;
     }
 
 
-    eventId.value =
-        event.id;
+    taskId.value =
+        task.id;
 
-    eventTitle.value =
-        event.title;
+    taskDay.value =
+        task.dayIndex;
 
-    eventDay.value =
-        event.dayIndex;
+    taskTitle.value =
+        task.title;
 
-    eventStart.value =
-        event.start;
+    taskStart.value =
+        task.start;
 
-    eventEnd.value =
-        event.end;
+    taskEnd.value =
+        task.end;
 
-    eventLocation.value =
-        event.location || "";
+    taskLocation.value =
+        task.location || "";
 
-    eventRepeat.value =
-        event.repeat || "weekly";
+    taskRepeat.value =
+        task.repeat;
 
-    eventColor.value =
-        event.color || "#4f46e5";
-
-    eventNotes.value =
-        event.notes || "";
+    taskNotes.value =
+        task.notes || "";
 
 
     modalTitle.textContent =
         translations[
             currentLanguage
-        ].editEventTitle;
+        ].editTask;
 
 
-    deleteEventBtn.classList.remove(
+    deleteBtn.classList.remove(
         "hidden"
     );
 
 
-    eventModal.classList.remove(
+    modal.classList.remove(
         "hidden"
     );
 }
@@ -1241,37 +1408,37 @@ function openEditModal(
 
 function closeModal() {
 
-    eventModal.classList.add(
+    modal.classList.add(
         "hidden"
     );
 }
 
 
 /* =========================================
-   CONFLICT CHECK
+   CONFLICT
 ========================================= */
 
 function hasConflict(
-    newEvent,
+    newTask,
     ignoreId = null
 ) {
 
     const newStart =
         timeToMinutes(
-            newEvent.start
+            newTask.start
         );
 
     const newEnd =
         timeToMinutes(
-            newEvent.end
+            newTask.end
         );
 
 
-    return events.some(
-        event => {
+    return tasks.some(
+        task => {
 
             if (
-                event.id === ignoreId
+                task.id === ignoreId
             ) {
 
                 return false;
@@ -1280,10 +1447,10 @@ function hasConflict(
 
             if (
                 Number(
-                    event.dayIndex
+                    task.dayIndex
                 ) !==
                 Number(
-                    newEvent.dayIndex
+                    newTask.dayIndex
                 )
             ) {
 
@@ -1292,22 +1459,21 @@ function hasConflict(
 
 
             /*
-               For weekly schedules,
-               compare with weekly events.
+               Two weekly tasks conflict
+               with each other.
 
-               Once-only events are also
-               compared when on the same
-               week/day.
+               Once-only tasks only conflict
+               if they are on the same date.
             */
 
             if (
-                newEvent.repeat === "once" &&
-                event.repeat === "once"
+                newTask.repeat === "once" &&
+                task.repeat === "once"
             ) {
 
                 if (
-                    event.date !==
-                    newEvent.date
+                    task.date !==
+                    newTask.date
                 ) {
 
                     return false;
@@ -1315,14 +1481,20 @@ function hasConflict(
             }
 
 
+            /*
+               A weekly task and a once-only
+               task on the same day/time
+               also conflict.
+            */
+
             const existingStart =
                 timeToMinutes(
-                    event.start
+                    task.start
                 );
 
             const existingEnd =
                 timeToMinutes(
-                    event.end
+                    task.end
                 );
 
 
@@ -1339,18 +1511,18 @@ function hasConflict(
    SAVE FORM
 ========================================= */
 
-eventForm.addEventListener(
+form.addEventListener(
     "submit",
-    function (e) {
+    event => {
 
-        e.preventDefault();
+        event.preventDefault();
 
 
         const start =
-            eventStart.value;
+            taskStart.value;
 
         const end =
-            eventEnd.value;
+            taskEnd.value;
 
 
         if (
@@ -1369,93 +1541,99 @@ eventForm.addEventListener(
 
 
         const id =
-            eventId.value ||
+            taskId.value ||
             generateId();
 
 
         /*
-           For weekly events:
+           WEEKLY TASK
+           ----------------
+           We store the weekday.
 
-           dayIndex is the permanent
-           weekday.
+           Example:
 
-           There is NO specific date.
+           Monday = 0
 
-           Therefore the event repeats
-           forever until deleted.
+           This means it will appear
+           every Monday automatically.
         */
 
+
+        /*
+           ONCE TASK
+           ----------------
+           We store an actual date.
+        */
 
         let date = null;
 
 
-        /*
-           Once-only events are attached
-           to the currently displayed week.
-        */
-
         if (
-            eventRepeat.value ===
+            taskRepeat.value ===
             "once"
         ) {
 
             const weekStart =
-                getDisplayedWeekStart();
+                getCurrentWeekStart();
 
 
             const selectedDate =
-                new Date(weekStart);
+                new Date(
+                    weekStart
+                );
+
 
             selectedDate.setDate(
                 selectedDate.getDate() +
-                Number(eventDay.value)
+                Number(
+                    taskDay.value
+                )
             );
 
 
             date =
-                getDateString(
+                dateToString(
                     selectedDate
                 );
         }
 
 
-        const newEvent = {
+        const newTask = {
 
-            id,
-
-            title:
-                eventTitle.value.trim(),
+            id: id,
 
             dayIndex:
                 Number(
-                    eventDay.value
+                    taskDay.value
                 ),
 
-            start,
+            title:
+                taskTitle.value.trim(),
 
-            end,
+            start:
+                start,
+
+            end:
+                end,
 
             location:
-                eventLocation.value.trim(),
+                taskLocation.value.trim(),
 
             repeat:
-                eventRepeat.value,
-
-            color:
-                eventColor.value,
+                taskRepeat.value,
 
             notes:
-                eventNotes.value.trim(),
+                taskNotes.value.trim(),
 
-            date
-
+            date:
+                date
         };
 
 
         if (
             hasConflict(
-                newEvent,
-                eventId.value || null
+                newTask,
+                taskId.value || null
             )
         ) {
 
@@ -1470,31 +1648,31 @@ eventForm.addEventListener(
 
 
         const existingIndex =
-            events.findIndex(
-                event =>
-                    event.id === id
+            tasks.findIndex(
+                task =>
+                    task.id === id
             );
 
 
         if (
-            existingIndex !== -1
+            existingIndex >= 0
         ) {
 
-            events[
+            tasks[
                 existingIndex
-            ] = newEvent;
+            ] = newTask;
 
         } else {
 
-            events.push(
-                newEvent
+            tasks.push(
+                newTask
             );
         }
 
 
-        saveEvents();
+        saveTasks();
 
-        renderSchedule();
+        renderTable();
 
         closeModal();
 
@@ -1509,78 +1687,78 @@ eventForm.addEventListener(
 
 
 /* =========================================
-   DELETE EVENT
+   DELETE
 ========================================= */
 
-deleteEventBtn.addEventListener(
+function deleteTask(id) {
+
+    const confirmed =
+        confirm(
+            translations[
+                currentLanguage
+            ].confirmDelete
+        );
+
+
+    if (!confirmed) {
+
+        return;
+    }
+
+
+    tasks =
+        tasks.filter(
+            task =>
+                task.id !== id
+        );
+
+
+    saveTasks();
+
+    renderTable();
+
+
+    showToast(
+        translations[
+            currentLanguage
+        ].deleted
+    );
+}
+
+
+/* =========================================
+   DELETE FROM MODAL
+========================================= */
+
+deleteBtn.addEventListener(
     "click",
     () => {
 
         const id =
-            eventId.value;
+            taskId.value;
 
 
-        if (!id) {
+        if (id) {
 
-            return;
+            deleteTask(id);
+
+            closeModal();
         }
-
-
-        const confirmed =
-            confirm(
-                translations[
-                    currentLanguage
-                ].confirmDelete
-            );
-
-
-        if (!confirmed) {
-
-            return;
-        }
-
-
-        events =
-            events.filter(
-                event =>
-                    event.id !== id
-            );
-
-
-        saveEvents();
-
-        renderSchedule();
-
-        closeModal();
-
-
-        showToast(
-            translations[
-                currentLanguage
-            ].deleted
-        );
     }
 );
 
 
 /* =========================================
-   ADD EVENT BUTTON
+   BUTTONS
 ========================================= */
 
 document
-    .getElementById("addEventBtn")
+    .getElementById("addBtn")
     .addEventListener(
         "click",
-        () => {
-
-            openAddModal();
-        }
+        openAddModal
     );
 
-
-/* =========================================
-   CLOSE BUTTON
-========================================= */
 
 document
     .getElementById("closeModalBtn")
@@ -1599,34 +1777,15 @@ document
 
 
 /* =========================================
-   CLICK OUTSIDE MODAL
+   MODAL OUTSIDE CLICK
 ========================================= */
 
-eventModal.addEventListener(
+modal.addEventListener(
     "click",
     event => {
 
         if (
-            event.target ===
-            eventModal
-        ) {
-
-            closeModal();
-        }
-    }
-);
-
-
-/* =========================================
-   ESCAPE KEY
-========================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key === "Escape"
+            event.target === modal
         ) {
 
             closeModal();
@@ -1659,7 +1818,7 @@ document
 
 
 /* =========================================
-   THEME
+   DARK MODE
 ========================================= */
 
 document
@@ -1684,7 +1843,9 @@ document
 ========================================= */
 
 document
-    .getElementById("previousWeekBtn")
+    .getElementById(
+        "previousWeekBtn"
+    )
     .addEventListener(
         "click",
         () => {
@@ -1693,13 +1854,15 @@ document
 
             updateWeekLabel();
 
-            renderSchedule();
+            renderTable();
         }
     );
 
 
 document
-    .getElementById("nextWeekBtn")
+    .getElementById(
+        "nextWeekBtn"
+    )
     .addEventListener(
         "click",
         () => {
@@ -1708,13 +1871,15 @@ document
 
             updateWeekLabel();
 
-            renderSchedule();
+            renderTable();
         }
     );
 
 
 document
-    .getElementById("todayBtn")
+    .getElementById(
+        "todayBtn"
+    )
     .addEventListener(
         "click",
         () => {
@@ -1723,13 +1888,31 @@ document
 
             updateWeekLabel();
 
-            renderSchedule();
+            renderTable();
         }
     );
 
 
 /* =========================================
-   ID GENERATOR
+   ESCAPE
+========================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeModal();
+        }
+    }
+);
+
+
+/* =========================================
+   ID
 ========================================= */
 
 function generateId() {
@@ -1756,12 +1939,10 @@ function generateId() {
    TOAST
 ========================================= */
 
-let toastTimer = null;
+let toastTimer;
 
 
-function showToast(
-    message
-) {
+function showToast(message) {
 
     toast.textContent =
         message;
@@ -1792,7 +1973,7 @@ function showToast(
 
 
 /* =========================================
-   START APP
+   START
 ========================================= */
 
 loadData();

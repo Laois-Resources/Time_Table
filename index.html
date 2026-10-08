@@ -4,347 +4,320 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Weekly Timetable</title>
+    <title>Weekly Planner</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div class="app">
+<div class="app">
 
-        <!-- HEADER -->
-        <header class="header">
+    <!-- HEADER -->
+    <header class="header">
 
-            <div>
-                <h1 id="appTitle">Weekly Timetable</h1>
-                <p id="appSubtitle">
-                    Your simple weekly schedule
-                </p>
-            </div>
+        <div>
+            <h1 id="appTitle">Weekly Planner</h1>
+            <p id="appSubtitle">
+                Organise what you need to do each week.
+            </p>
+        </div>
 
-            <div class="header-actions">
-                <button id="languageBtn" class="secondary-btn">
-                    العربية
-                </button>
+        <div class="header-actions">
 
-                <button id="themeBtn" class="secondary-btn">
-                    🌙
-                </button>
-
-                <button id="addEventBtn" class="primary-btn">
-                    + <span id="addEventText">Add Event</span>
-                </button>
-            </div>
-
-        </header>
-
-
-        <!-- WEEK CONTROLS -->
-        <section class="week-controls">
-
-            <button id="previousWeekBtn" class="control-btn">
-                ← <span id="previousText">Previous</span>
+            <button id="languageBtn" class="secondary-btn">
+                العربية
             </button>
 
-            <button id="todayBtn" class="control-btn">
-                <span id="todayText">Today</span>
+            <button id="themeBtn" class="secondary-btn">
+                🌙
             </button>
 
-            <div id="weekLabel" class="week-label">
-                Weekly Schedule
-            </div>
-
-            <button id="nextWeekBtn" class="control-btn">
-                <span id="nextText">Next</span> →
+            <button id="addBtn" class="primary-btn">
+                + Add
             </button>
 
-        </section>
+        </div>
+
+    </header>
 
 
-        <!-- TABLE -->
-        <main class="schedule-wrapper">
+    <!-- WEEK NAVIGATION -->
+    <section class="week-bar">
 
-            <div class="table-scroll">
+        <button id="previousWeekBtn" class="secondary-btn">
+            ← Previous
+        </button>
 
-                <table id="scheduleTable">
+        <button id="todayBtn" class="secondary-btn">
+            Today
+        </button>
 
-                    <thead>
-                        <tr>
-                            <th class="time-column" id="timeHeader">
-                                Time
-                            </th>
+        <div id="weekLabel" class="week-label">
+            This Week
+        </div>
 
-                            <th>
-                                <span class="day-name" data-day="0">
-                                    Monday
-                                </span>
-                            </th>
+        <button id="nextWeekBtn" class="secondary-btn">
+            Next →
+        </button>
 
-                            <th>
-                                <span class="day-name" data-day="1">
-                                    Tuesday
-                                </span>
-                            </th>
+    </section>
 
-                            <th>
-                                <span class="day-name" data-day="2">
-                                    Wednesday
-                                </span>
-                            </th>
 
-                            <th>
-                                <span class="day-name" data-day="3">
-                                    Thursday
-                                </span>
-                            </th>
+    <!-- TABLE -->
+    <section class="table-container">
 
-                            <th>
-                                <span class="day-name" data-day="4">
-                                    Friday
-                                </span>
-                            </th>
+        <div class="table-scroll">
 
-                            <th>
-                                <span class="day-name" data-day="5">
-                                    Saturday
-                                </span>
-                            </th>
+            <table>
 
-                            <th>
-                                <span class="day-name" data-day="6">
-                                    Sunday
-                                </span>
-                            </th>
-                        </tr>
-                    </thead>
+                <thead>
 
-                    <tbody id="scheduleBody"></tbody>
+                    <tr>
 
-                </table>
+                        <th>Day</th>
+
+                        <th>What to do</th>
+
+                        <th>Time</th>
+
+                        <th>Location</th>
+
+                        <th>Repeat</th>
+
+                        <th>Notes</th>
+
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="taskTableBody">
+                    <!-- JavaScript adds rows here -->
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div id="emptyMessage" class="empty-message">
+            No tasks added yet.
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- ADD / EDIT MODAL -->
+
+<div id="modal" class="modal hidden">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                Add Task
+            </h2>
+
+            <button id="closeModalBtn" class="close-btn">
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="taskForm">
+
+            <input
+                type="hidden"
+                id="taskId"
+            >
+
+
+            <!-- DAY -->
+
+            <div class="form-group">
+
+                <label for="taskDay">
+                    Day
+                </label>
+
+                <select id="taskDay" required>
+
+                    <option value="0">Monday</option>
+                    <option value="1">Tuesday</option>
+                    <option value="2">Wednesday</option>
+                    <option value="3">Thursday</option>
+                    <option value="4">Friday</option>
+                    <option value="5">Saturday</option>
+                    <option value="6">Sunday</option>
+
+                </select>
 
             </div>
 
-            <div class="table-hint" id="tableHint">
-                Click an empty time slot to add an event.
-            </div>
 
-        </main>
+            <!-- WHAT TO DO -->
 
-    </div>
+            <div class="form-group">
 
+                <label for="taskTitle">
+                    What do you need to do?
+                </label>
 
-    <!-- ADD / EDIT MODAL -->
-    <div id="eventModal" class="modal hidden">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-
-                <h2 id="modalTitle">
-                    Add Event
-                </h2>
-
-                <button id="closeModalBtn" class="close-btn">
-                    ×
-                </button>
+                <input
+                    type="text"
+                    id="taskTitle"
+                    placeholder="e.g. Test, Meeting, Assignment..."
+                    required
+                >
 
             </div>
 
 
-            <form id="eventForm">
+            <!-- TIME -->
 
-                <input type="hidden" id="eventId">
+            <div class="form-row">
 
-
-                <!-- TITLE -->
                 <div class="form-group">
 
-                    <label for="eventTitle" id="titleLabel">
-                        Event / Class
+                    <label for="taskStart">
+                        Start time
                     </label>
 
                     <input
-                        type="text"
-                        id="eventTitle"
-                        placeholder="e.g. Web Development"
+                        type="time"
+                        id="taskStart"
                         required
                     >
 
                 </div>
 
 
-                <!-- DAY -->
                 <div class="form-group">
 
-                    <label for="eventDay" id="dayLabel">
-                        Day
-                    </label>
-
-                    <select id="eventDay" required>
-
-                        <option value="0">Monday</option>
-                        <option value="1">Tuesday</option>
-                        <option value="2">Wednesday</option>
-                        <option value="3">Thursday</option>
-                        <option value="4">Friday</option>
-                        <option value="5">Saturday</option>
-                        <option value="6">Sunday</option>
-
-                    </select>
-
-                </div>
-
-
-                <!-- START / END -->
-                <div class="form-row">
-
-                    <div class="form-group">
-
-                        <label for="eventStart" id="startLabel">
-                            Start
-                        </label>
-
-                        <input
-                            type="time"
-                            id="eventStart"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="eventEnd" id="endLabel">
-                            End
-                        </label>
-
-                        <input
-                            type="time"
-                            id="eventEnd"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- LOCATION -->
-                <div class="form-group">
-
-                    <label for="eventLocation" id="locationLabel">
-                        Location
+                    <label for="taskEnd">
+                        End time
                     </label>
 
                     <input
-                        type="text"
-                        id="eventLocation"
-                        placeholder="e.g. Room 204"
+                        type="time"
+                        id="taskEnd"
+                        required
                     >
 
                 </div>
 
-
-                <!-- REPEAT -->
-                <div class="form-group">
-
-                    <label for="eventRepeat" id="repeatLabel">
-                        Repeat
-                    </label>
-
-                    <select id="eventRepeat">
-
-                        <option value="weekly">
-                            Every week
-                        </option>
-
-                        <option value="once">
-                            Once only
-                        </option>
-
-                    </select>
-
-                </div>
+            </div>
 
 
-                <!-- COLOR -->
-                <div class="form-group">
+            <!-- LOCATION -->
 
-                    <label for="eventColor" id="colorLabel">
-                        Colour
-                    </label>
+            <div class="form-group">
 
-                    <input
-                        type="color"
-                        id="eventColor"
-                        value="#4f46e5"
-                    >
+                <label for="taskLocation">
+                    Location
+                </label>
 
-                </div>
+                <input
+                    type="text"
+                    id="taskLocation"
+                    placeholder="e.g. Room 204"
+                >
 
-
-                <!-- NOTES -->
-                <div class="form-group">
-
-                    <label for="eventNotes" id="notesLabel">
-                        Notes
-                    </label>
-
-                    <textarea
-                        id="eventNotes"
-                        rows="3"
-                        placeholder="Optional notes..."
-                    ></textarea>
-
-                </div>
+            </div>
 
 
-                <!-- BUTTONS -->
-                <div class="form-actions">
+            <!-- REPEAT -->
+
+            <div class="form-group">
+
+                <label for="taskRepeat">
+                    Repeat
+                </label>
+
+                <select id="taskRepeat">
+
+                    <option value="weekly">
+                        Every week
+                    </option>
+
+                    <option value="once">
+                        Once only
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group">
+
+                <label for="taskNotes">
+                    Notes
+                </label>
+
+                <textarea
+                    id="taskNotes"
+                    rows="3"
+                    placeholder="Optional notes..."
+                ></textarea>
+
+            </div>
+
+
+            <!-- BUTTONS -->
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    id="deleteBtn"
+                    class="danger-btn hidden"
+                >
+                    Delete
+                </button>
+
+
+                <div class="right-buttons">
 
                     <button
                         type="button"
-                        id="deleteEventBtn"
-                        class="danger-btn hidden"
+                        id="cancelBtn"
+                        class="secondary-btn"
                     >
-                        Delete
+                        Cancel
                     </button>
 
-                    <div class="form-actions-right">
-
-                        <button
-                            type="button"
-                            id="cancelBtn"
-                            class="secondary-btn"
-                        >
-                            Cancel
-                        </button>
-
-                        <button
-                            type="submit"
-                            class="primary-btn"
-                        >
-                            <span id="saveText">Save</span>
-                        </button>
-
-                    </div>
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                    >
+                        Save
+                    </button>
 
                 </div>
 
-            </form>
+            </div>
 
-        </div>
+        </form>
 
     </div>
 
-
-    <!-- TOAST -->
-    <div id="toast" class="toast"></div>
+</div>
 
 
-    <script src="script.js"></script>
+<!-- TOAST -->
+
+<div id="toast" class="toast"></div>
+
+
+<script src="script.js"></script>
 
 </body>
 </html>
