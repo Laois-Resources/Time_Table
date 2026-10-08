@@ -1,188 +1,121 @@
-/*
-    SIMPLE WEEKLY TIMETABLE
-
-    Features:
-
-    ✓ Monday → Sunday
-    ✓ Time × Day table
-    ✓ English / Arabic
-    ✓ RTL Arabic
-    ✓ LocalStorage
-    ✓ Add event
-    ✓ Edit event
-    ✓ Delete event
-    ✓ Location
-    ✓ Notes
-    ✓ Event colors
-    ✓ Week navigation
-    ✓ Dark mode
-    ✓ Mobile responsive
-
-    No backend.
-    No database.
-    No import/export.
-*/
+/* =========================================
+   WEEKLY TIMETABLE
+   LocalStorage + Repeat System
+========================================= */
 
 
-/* =========================
+/* =========================================
    STORAGE
-========================= */
+========================================= */
 
-const STORAGE_KEY =
-    "simple_weekly_schedule";
-
-
-const SETTINGS_KEY =
-    "simple_weekly_schedule_settings";
+const STORAGE_KEY = "weeklyTimetableEvents";
+const SETTINGS_KEY = "weeklyTimetableSettings";
 
 
-/* =========================
+/* =========================================
    TRANSLATIONS
-========================= */
+========================================= */
 
 const translations = {
 
     en: {
 
-        title:
-            "Weekly Schedule",
+        title: "Weekly Timetable",
+        subtitle: "Your simple weekly schedule",
 
-        subtitle:
-            "Your weekly timetable",
+        addEvent: "Add Event",
 
-        addEvent:
-            "Add Event",
+        previous: "Previous",
+        today: "Today",
+        next: "Next",
 
-        previous:
-            "Previous",
+        time: "Time",
 
-        next:
-            "Next",
+        addEventTitle: "Add Event",
+        editEventTitle: "Edit Event",
 
-        today:
-            "Today",
+        eventClass: "Event / Class",
+        day: "Day",
 
-        eventHint:
-            "Add your schedule details.",
+        start: "Start",
+        end: "End",
 
-        eventName:
-            "Event / Subject",
+        location: "Location",
 
-        day:
-            "Day",
+        repeat: "Repeat",
 
-        start:
-            "Start",
+        everyWeek: "Every week",
+        onceOnly: "Once only",
 
-        end:
-            "End",
+        colour: "Colour",
+        notes: "Notes",
 
-        location:
-            "Location",
+        notesPlaceholder: "Optional notes...",
 
-        notes:
-            "Notes",
+        save: "Save",
+        cancel: "Cancel",
+        delete: "Delete",
 
-        color:
-            "Color",
+        tableHint:
+            "Click an empty time slot to add an event.",
 
-        delete:
-            "Delete",
+        weekly:
+            "Weekly",
 
-        cancel:
-            "Cancel",
-
-        save:
-            "Save",
-
-        newEvent:
-            "New Event",
-
-        editEvent:
-            "Edit Event",
-
-        emptyTitle:
-            "Your schedule is empty",
-
-        emptyText:
-            "Click a time slot or Add Event to begin.",
-
-        saved:
-            "Event saved",
-
-        deleted:
-            "Event deleted",
+        conflict:
+            "This time overlaps with another event.",
 
         invalidTime:
             "End time must be after start time.",
 
-        conflict:
-            "This time overlaps another event.",
+        deleted:
+            "Event deleted.",
 
-        days: [
+        saved:
+            "Event saved.",
 
-            "Monday",
+        confirmDelete:
+            "Are you sure you want to delete this event?",
 
-            "Tuesday",
+        noEvents:
+            "No events",
 
-            "Wednesday",
-
-            "Thursday",
-
-            "Friday",
-
-            "Saturday",
-
-            "Sunday"
-
-        ],
-
-        shortDays: [
-
-            "Mon",
-
-            "Tue",
-
-            "Wed",
-
-            "Thu",
-
-            "Fri",
-
-            "Sat",
-
-            "Sun"
-
-        ]
+        repeatBadge:
+            "Every week"
 
     },
 
 
     ar: {
 
-        title:
-            "الجدول الأسبوعي",
+        title: "الجدول الأسبوعي",
 
         subtitle:
-            "جدولك الأسبوعي",
+            "جدولك الأسبوعي البسيط",
 
         addEvent:
-            "إضافة موعد",
+            "إضافة حدث",
 
         previous:
             "السابق",
 
-        next:
-            "التالي",
-
         today:
             "اليوم",
 
-        eventHint:
-            "أضف تفاصيل جدولك.",
+        next:
+            "التالي",
 
-        eventName:
-            "المادة / الموعد",
+        time:
+            "الوقت",
+
+        addEventTitle:
+            "إضافة حدث",
+
+        editEventTitle:
+            "تعديل الحدث",
+
+        eventClass:
+            "الحدث / المادة",
 
         day:
             "اليوم",
@@ -194,266 +127,692 @@ const translations = {
             "النهاية",
 
         location:
-            "المكان",
+            "الموقع",
+
+        repeat:
+            "التكرار",
+
+        everyWeek:
+            "كل أسبوع",
+
+        onceOnly:
+            "مرة واحدة",
+
+        colour:
+            "اللون",
 
         notes:
             "ملاحظات",
 
-        color:
-            "اللون",
-
-        delete:
-            "حذف",
-
-        cancel:
-            "إلغاء",
+        notesPlaceholder:
+            "ملاحظات اختيارية...",
 
         save:
             "حفظ",
 
-        newEvent:
-            "موعد جديد",
+        cancel:
+            "إلغاء",
 
-        editEvent:
-            "تعديل الموعد",
+        delete:
+            "حذف",
 
-        emptyTitle:
-            "جدولك فارغ",
+        tableHint:
+            "اضغط على خانة زمنية فارغة لإضافة حدث.",
 
-        emptyText:
-            "اضغط على أي وقت لإضافة موعد.",
+        weekly:
+            "أسبوعي",
 
-        saved:
-            "تم حفظ الموعد",
-
-        deleted:
-            "تم حذف الموعد",
+        conflict:
+            "هذا الوقت يتداخل مع حدث آخر.",
 
         invalidTime:
             "يجب أن يكون وقت النهاية بعد وقت البداية.",
 
-        conflict:
-            "هذا الوقت يتداخل مع موعد آخر.",
+        deleted:
+            "تم حذف الحدث.",
 
-        days: [
+        saved:
+            "تم حفظ الحدث.",
 
-            "الاثنين",
+        confirmDelete:
+            "هل أنت متأكد أنك تريد حذف هذا الحدث؟",
 
-            "الثلاثاء",
+        noEvents:
+            "لا توجد أحداث",
 
-            "الأربعاء",
-
-            "الخميس",
-
-            "الجمعة",
-
-            "السبت",
-
-            "الأحد"
-
-        ],
-
-        shortDays: [
-
-            "الإثنين",
-
-            "الثلاثاء",
-
-            "الأربعاء",
-
-            "الخميس",
-
-            "الجمعة",
-
-            "السبت",
-
-            "الأحد"
-
-        ]
+        repeatBadge:
+            "كل أسبوع"
 
     }
 
 };
 
 
-/* =========================
-   COLORS
-========================= */
+/* =========================================
+   DAYS
+========================================= */
 
-const COLORS = [
+const days = {
 
-    "#2563eb",
+    en: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+    ],
 
-    "#7c3aed",
+    ar: [
+        "الاثنين",
+        "الثلاثاء",
+        "الأربعاء",
+        "الخميس",
+        "الجمعة",
+        "السبت",
+        "الأحد"
+    ]
 
-    "#db2777",
-
-    "#ea580c",
-
-    "#16a34a",
-
-    "#0891b2",
-
-    "#475569"
-
-];
-
-
-/* =========================
-   STATE
-========================= */
-
-let events =
-    JSON.parse(
-        localStorage.getItem(
-            STORAGE_KEY
-        ) || "[]"
-    );
+};
 
 
-let settings =
-    JSON.parse(
-        localStorage.getItem(
-            SETTINGS_KEY
-        )
-        ||
-        '{"language":"en","theme":"light"}'
-    );
+/* =========================================
+   APP STATE
+========================================= */
 
+let events = [];
+
+let currentLanguage = "en";
+
+let darkMode = false;
 
 let weekOffset = 0;
 
 
-let selectedColor =
-    COLORS[0];
+/* =========================================
+   DOM
+========================================= */
+
+const scheduleBody =
+    document.getElementById("scheduleBody");
+
+const eventModal =
+    document.getElementById("eventModal");
+
+const eventForm =
+    document.getElementById("eventForm");
+
+const eventId =
+    document.getElementById("eventId");
+
+const eventTitle =
+    document.getElementById("eventTitle");
+
+const eventDay =
+    document.getElementById("eventDay");
+
+const eventStart =
+    document.getElementById("eventStart");
+
+const eventEnd =
+    document.getElementById("eventEnd");
+
+const eventLocation =
+    document.getElementById("eventLocation");
+
+const eventRepeat =
+    document.getElementById("eventRepeat");
+
+const eventColor =
+    document.getElementById("eventColor");
+
+const eventNotes =
+    document.getElementById("eventNotes");
+
+const deleteEventBtn =
+    document.getElementById("deleteEventBtn");
+
+const modalTitle =
+    document.getElementById("modalTitle");
+
+const weekLabel =
+    document.getElementById("weekLabel");
+
+const toast =
+    document.getElementById("toast");
 
 
-/* =========================
-   SHORTCUT
-========================= */
+/* =========================================
+   LOAD DATA
+========================================= */
 
-function $(id) {
+function loadData() {
 
-    return document.getElementById(id);
+    try {
 
+        const storedEvents =
+            localStorage.getItem(STORAGE_KEY);
+
+        if (storedEvents) {
+
+            events = JSON.parse(storedEvents);
+
+        } else {
+
+            events = [];
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Could not load events:",
+            error
+        );
+
+        events = [];
+    }
+
+
+    try {
+
+        const storedSettings =
+            localStorage.getItem(SETTINGS_KEY);
+
+        if (storedSettings) {
+
+            const settings =
+                JSON.parse(storedSettings);
+
+            currentLanguage =
+                settings.language || "en";
+
+            darkMode =
+                settings.darkMode || false;
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Could not load settings:",
+            error
+        );
+    }
+
+
+    applySettings();
 }
 
 
-function t(key) {
-
-    return translations[
-        settings.language
-    ][key];
-
-}
-
-
-/* =========================
-   SAVE DATA
-========================= */
+/* =========================================
+   SAVE EVENTS
+========================================= */
 
 function saveEvents() {
 
     localStorage.setItem(
-
         STORAGE_KEY,
-
         JSON.stringify(events)
-
     );
-
 }
 
+
+/* =========================================
+   SAVE SETTINGS
+========================================= */
 
 function saveSettings() {
 
     localStorage.setItem(
-
         SETTINGS_KEY,
+        JSON.stringify({
 
-        JSON.stringify(settings)
+            language: currentLanguage,
 
+            darkMode: darkMode
+
+        })
     );
-
 }
 
 
-/* =========================
-   DATE HELPERS
-========================= */
+/* =========================================
+   SETTINGS
+========================================= */
+
+function applySettings() {
+
+    const t =
+        translations[currentLanguage];
+
+
+    document.documentElement.lang =
+        currentLanguage;
+
+
+    document.body.classList.toggle(
+        "rtl",
+        currentLanguage === "ar"
+    );
+
+
+    document.body.classList.toggle(
+        "dark",
+        darkMode
+    );
+
+
+    document.getElementById("appTitle").textContent =
+        t.title;
+
+    document.getElementById("appSubtitle").textContent =
+        t.subtitle;
+
+    document.getElementById("addEventText").textContent =
+        t.addEvent;
+
+    document.getElementById("previousText").textContent =
+        t.previous;
+
+    document.getElementById("todayText").textContent =
+        t.today;
+
+    document.getElementById("nextText").textContent =
+        t.next;
+
+    document.getElementById("timeHeader").textContent =
+        t.time;
+
+    document.getElementById("tableHint").textContent =
+        t.tableHint;
+
+    document.getElementById("titleLabel").textContent =
+        t.eventClass;
+
+    document.getElementById("dayLabel").textContent =
+        t.day;
+
+    document.getElementById("startLabel").textContent =
+        t.start;
+
+    document.getElementById("endLabel").textContent =
+        t.end;
+
+    document.getElementById("locationLabel").textContent =
+        t.location;
+
+    document.getElementById("repeatLabel").textContent =
+        t.repeat;
+
+    document.getElementById("colorLabel").textContent =
+        t.colour;
+
+    document.getElementById("notesLabel").textContent =
+        t.notes;
+
+    document.getElementById("saveText").textContent =
+        t.save;
+
+    document.getElementById("cancelBtn").textContent =
+        t.cancel;
+
+    document.getElementById("deleteEventBtn").textContent =
+        t.delete;
+
+
+    document.getElementById("languageBtn").textContent =
+        currentLanguage === "en"
+            ? "العربية"
+            : "English";
+
+
+    document.getElementById("themeBtn").textContent =
+        darkMode
+            ? "☀️"
+            : "🌙";
+
+
+    eventTitle.placeholder =
+        currentLanguage === "en"
+            ? "e.g. Web Development"
+            : "مثال: تطوير الويب";
+
+
+    eventLocation.placeholder =
+        currentLanguage === "en"
+            ? "e.g. Room 204"
+            : "مثال: الغرفة 204";
+
+
+    eventNotes.placeholder =
+        t.notesPlaceholder;
+
+
+    updateDayOptions();
+
+    updateRepeatOptions();
+
+    updateWeekLabel();
+
+    renderSchedule();
+}
+
+
+/* =========================================
+   DAY OPTIONS
+========================================= */
+
+function updateDayOptions() {
+
+    const currentValue =
+        eventDay.value;
+
+    eventDay.innerHTML = "";
+
+
+    days[currentLanguage].forEach(
+        (day, index) => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = index;
+
+            option.textContent = day;
+
+            eventDay.appendChild(option);
+        }
+    );
+
+
+    if (currentValue !== "") {
+
+        eventDay.value =
+            currentValue;
+    }
+}
+
+
+/* =========================================
+   REPEAT OPTIONS
+========================================= */
+
+function updateRepeatOptions() {
+
+    const currentValue =
+        eventRepeat.value || "weekly";
+
+    eventRepeat.innerHTML = "";
+
+
+    const weeklyOption =
+        document.createElement("option");
+
+    weeklyOption.value =
+        "weekly";
+
+    weeklyOption.textContent =
+        translations[currentLanguage].everyWeek;
+
+
+    const onceOption =
+        document.createElement("option");
+
+    onceOption.value =
+        "once";
+
+    onceOption.textContent =
+        translations[currentLanguage].onceOnly;
+
+
+    eventRepeat.appendChild(
+        weeklyOption
+    );
+
+    eventRepeat.appendChild(
+        onceOption
+    );
+
+
+    eventRepeat.value =
+        currentValue;
+}
+
+
+/* =========================================
+   WEEK FUNCTIONS
+========================================= */
 
 function getMonday(date) {
 
-    const result =
+    const d =
         new Date(date);
 
+    const day =
+        d.getDay();
 
-    result.setHours(
-        0,
-        0,
+    const difference =
+        day === 0
+            ? -6
+            : 1 - day;
+
+    d.setDate(
+        d.getDate() + difference
+    );
+
+    d.setHours(0, 0, 0, 0);
+
+    return d;
+}
+
+
+function getDisplayedWeekStart() {
+
+    const today =
+        new Date();
+
+    const monday =
+        getMonday(today);
+
+    monday.setDate(
+        monday.getDate() +
+        (weekOffset * 7)
+    );
+
+    return monday;
+}
+
+
+function formatDate(date) {
+
+    return date.toLocaleDateString(
+        currentLanguage === "ar"
+            ? "ar-IQ"
+            : "en-IE",
+        {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+        }
+    );
+}
+
+
+function updateWeekLabel() {
+
+    const start =
+        getDisplayedWeekStart();
+
+    const end =
+        new Date(start);
+
+    end.setDate(
+        end.getDate() + 6
+    );
+
+
+    if (weekOffset === 0) {
+
+        weekLabel.textContent =
+            currentLanguage === "en"
+                ? "This Week"
+                : "هذا الأسبوع";
+
+        return;
+    }
+
+
+    weekLabel.textContent =
+        `${formatDate(start)} - ${formatDate(end)}`;
+}
+
+
+/* =========================================
+   TIME
+========================================= */
+
+function timeToMinutes(time) {
+
+    const [hours, minutes] =
+        time.split(":").map(Number);
+
+    return (
+        hours * 60 +
+        minutes
+    );
+}
+
+
+function formatTime(time) {
+
+    const [hours, minutes] =
+        time.split(":").map(Number);
+
+
+    const date =
+        new Date();
+
+    date.setHours(
+        hours,
+        minutes,
         0,
         0
     );
 
 
-    let day =
-        result.getDay();
+    return date.toLocaleTimeString(
+        currentLanguage === "ar"
+            ? "ar-IQ"
+            : "en-IE",
+        {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        }
+    );
+}
 
 
-    if (day === 0) {
+/* =========================================
+   TIME SLOTS
+========================================= */
 
-        day = 7;
+function createTimeSlots() {
 
+    const slots = [];
+
+
+    /*
+       06:00 -> 22:00
+       One row per hour.
+    */
+
+    for (
+        let hour = 6;
+        hour <= 22;
+        hour++
+    ) {
+
+        const time =
+            `${String(hour).padStart(2, "0")}:00`;
+
+        slots.push(time);
     }
 
 
-    result.setDate(
-        result.getDate()
-        -
-        day
-        +
-        1
-    );
-
-
-    return result;
-
+    return slots;
 }
 
 
-function getWeekStart() {
+/* =========================================
+   EVENT VISIBILITY
+========================================= */
 
-    const monday =
-        getMonday(
-            new Date()
+function eventBelongsToCurrentWeek(
+    event
+) {
+
+    /*
+       WEEKLY EVENT:
+       Appears every week on its dayIndex.
+
+       ONCE EVENT:
+       Appears only during the week
+       where it was originally created.
+    */
+
+
+    if (event.repeat === "weekly") {
+
+        return true;
+    }
+
+
+    if (!event.date) {
+
+        return false;
+    }
+
+
+    const eventDate =
+        new Date(
+            event.date + "T00:00:00"
         );
 
 
-    monday.setDate(
+    const weekStart =
+        getDisplayedWeekStart();
 
-        monday.getDate()
-        +
-        weekOffset * 7
 
+    const weekEnd =
+        new Date(weekStart);
+
+    weekEnd.setDate(
+        weekEnd.getDate() + 6
     );
 
 
-    return monday;
-
+    return (
+        eventDate >= weekStart &&
+        eventDate <= weekEnd
+    );
 }
 
 
-function dateKey(date) {
+/* =========================================
+   EVENT DATE
+========================================= */
+
+function getDateString(date) {
 
     const year =
         date.getFullYear();
-
 
     const month =
         String(
             date.getMonth() + 1
         ).padStart(2, "0");
-
 
     const day =
         String(
@@ -462,702 +821,361 @@ function dateKey(date) {
 
 
     return `${year}-${month}-${day}`;
-
 }
 
 
-function formatDate(date) {
+/* =========================================
+   GET VISIBLE EVENTS
+========================================= */
 
-    return new Intl.DateTimeFormat(
+function getVisibleEvents() {
 
-        settings.language === "ar"
-            ? "ar-IQ"
-            : "en-GB",
-
-        {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        }
-
-    ).format(date);
-
-}
-
-
-/* =========================
-   TIME HELPERS
-========================= */
-
-function timeToMinutes(time) {
-
-    const parts =
-        time.split(":");
-
-
-    return (
-
-        Number(parts[0]) * 60
-
-        +
-
-        Number(parts[1])
-
+    return events.filter(
+        event =>
+            eventBelongsToCurrentWeek(
+                event
+            )
     );
-
 }
 
 
-/* =========================
-   GET WEEK
-========================= */
+/* =========================================
+   RENDER TABLE
+========================================= */
 
-function getWeekDays() {
+function renderSchedule() {
 
-    const start =
-        getWeekStart();
-
-
-    const days = [];
+    scheduleBody.innerHTML = "";
 
 
-    for (
-        let i = 0;
-        i < 7;
-        i++
-    ) {
-
-        const day =
-            new Date(start);
+    const timeSlots =
+        createTimeSlots();
 
 
-        day.setDate(
-            day.getDate() + i
-        );
+    const visibleEvents =
+        getVisibleEvents();
 
 
-        days.push(day);
+    timeSlots.forEach(
+        time => {
 
-    }
-
-
-    return days;
-
-}
+            const row =
+                document.createElement("tr");
 
 
-/* =========================
-   LANGUAGE
-========================= */
+            /* TIME CELL */
 
-function applyLanguage() {
+            const timeCell =
+                document.createElement("td");
 
-    document.documentElement.lang =
-        settings.language;
+            timeCell.className =
+                "time-cell";
 
+            timeCell.textContent =
+                formatTime(time);
 
-    document.documentElement.dir =
-        settings.language === "ar"
-            ? "rtl"
-            : "ltr";
-
-
-    $("appTitle").textContent =
-        t("title");
+            row.appendChild(
+                timeCell
+            );
 
 
-    $("appSubtitle").textContent =
-        t("subtitle");
+            /* DAY CELLS */
 
-
-    $("languageBtn").textContent =
-        settings.language === "en"
-            ? "العربية"
-            : "English";
-
-
-    document
-        .querySelectorAll(
-            "[data-i18n]"
-        )
-        .forEach(element => {
-
-            const key =
-                element.dataset.i18n;
-
-
-            if (
-                t(key)
+            for (
+                let dayIndex = 0;
+                dayIndex < 7;
+                dayIndex++
             ) {
-
-                element.textContent =
-                    t(key);
-
-            }
-
-        });
-
-
-    renderDaySelect();
-
-    render();
-
-}
-
-
-/* =========================
-   DAY SELECT
-========================= */
-
-function renderDaySelect() {
-
-    const select =
-        $("dayInput");
-
-
-    select.innerHTML =
-        "";
-
-
-    t("days").forEach(
-        (day, index) => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                index;
-
-
-            option.textContent =
-                day;
-
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================
-   COLORS
-========================= */
-
-function renderColors() {
-
-    const container =
-        $("colorRow");
-
-
-    container.innerHTML =
-        "";
-
-
-    COLORS.forEach(
-        color => {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-
-            button.type =
-                "button";
-
-
-            button.className =
-                "color-choice";
-
-
-            button.style.background =
-                color;
-
-
-            if (
-                color === selectedColor
-            ) {
-
-                button.classList.add(
-                    "selected"
-                );
-
-            }
-
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    selectedColor =
-                        color;
-
-
-                    renderColors();
-
-                }
-            );
-
-
-            container.appendChild(
-                button
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================
-   EVENTS FOR DAY
-========================= */
-
-function eventsForDate(date) {
-
-    const key =
-        dateKey(date);
-
-
-    return events
-        .filter(
-            event =>
-                event.date === key
-        )
-        .sort(
-            (a, b) =>
-                a.start.localeCompare(
-                    b.start
-                )
-        );
-
-}
-
-
-/* =========================
-   RENDER
-========================= */
-
-function render() {
-
-    const days =
-        getWeekDays();
-
-
-    $("weekLabel").textContent =
-        `${formatDate(days[0])} – ${formatDate(days[6])}`;
-
-
-    renderTable(days);
-
-
-    $("emptyState").style.display =
-        events.length
-            ? "none"
-            : "block";
-
-
-    $("scheduleContainer").style.display =
-        events.length
-            ? "block"
-            : "none";
-
-}
-
-
-/* =========================
-   TABLE
-========================= */
-
-function renderTable(days) {
-
-    const table =
-        document.createElement(
-            "table"
-        );
-
-
-    table.className =
-        "schedule-table";
-
-
-    /* =====================
-       HEADER
-    ===================== */
-
-    const thead =
-        document.createElement(
-            "thead"
-        );
-
-
-    const headerRow =
-        document.createElement(
-            "tr"
-        );
-
-
-    const emptyHeader =
-        document.createElement(
-            "th"
-        );
-
-
-    emptyHeader.textContent =
-        "Time";
-
-
-    headerRow.appendChild(
-        emptyHeader
-    );
-
-
-    days.forEach(
-        (date, index) => {
-
-            const th =
-                document.createElement(
-                    "th"
-                );
-
-
-            const isToday =
-                dateKey(date)
-                ===
-                dateKey(
-                    new Date()
-                );
-
-
-            if (isToday) {
-
-                th.classList.add(
-                    "today"
-                );
-
-            }
-
-
-            th.innerHTML = `
-
-                ${t("shortDays")[index]}
-
-                <span class="day-number">
-
-                    ${date.getDate()}
-
-                </span>
-
-            `;
-
-
-            headerRow.appendChild(
-                th
-            );
-
-        }
-    );
-
-
-    thead.appendChild(
-        headerRow
-    );
-
-
-    table.appendChild(
-        thead
-    );
-
-
-    /* =====================
-       BODY
-    ===================== */
-
-    const tbody =
-        document.createElement(
-            "tbody"
-        );
-
-
-    /*
-        Schedule starts at 06:00
-        and ends at 23:00.
-    */
-
-    for (
-        let hour = 6;
-        hour < 23;
-        hour++
-    ) {
-
-        const row =
-            document.createElement(
-                "tr"
-            );
-
-
-        /* TIME */
-
-        const timeCell =
-            document.createElement(
-                "td"
-            );
-
-
-        timeCell.className =
-            "time-cell";
-
-
-        timeCell.textContent =
-            `${String(hour).padStart(2, "0")}:00`;
-
-
-        row.appendChild(
-            timeCell
-        );
-
-
-        /* DAYS */
-
-        days.forEach(
-            (date, dayIndex) => {
 
                 const cell =
-                    document.createElement(
-                        "td"
-                    );
-
+                    document.createElement("td");
 
                 cell.className =
                     "schedule-cell";
 
+                cell.dataset.day =
+                    dayIndex;
+
+                cell.dataset.time =
+                    time;
+
+
+                cell.addEventListener(
+                    "click",
+                    () => {
+
+                        openAddModal(
+                            dayIndex,
+                            time
+                        );
+                    }
+                );
+
 
                 /*
-                    Find an event that
-                    starts at this hour.
+                   Find event beginning at
+                   this exact hour.
                 */
 
-                const dayEvents =
-                    eventsForDate(date);
+                const cellEvents =
+                    visibleEvents.filter(
+                        event =>
 
+                            Number(
+                                event.dayIndex
+                            ) === dayIndex &&
 
-                const event =
-                    dayEvents.find(
-                        item =>
-                            timeToMinutes(
-                                item.start
-                            ) ===
-                            hour * 60
+                            event.start === time
                     );
 
 
-                if (event) {
+                cellEvents.forEach(
+                    event => {
 
-                    const card =
-                        document.createElement(
-                            "div"
+                        const eventElement =
+                            createEventElement(
+                                event
+                            );
+
+                        cell.appendChild(
+                            eventElement
                         );
-
-
-                    card.className =
-                        "event-card";
-
-
-                    card.style.background =
-                        event.color;
-
-
-                    card.innerHTML = `
-
-                        <span class="event-title">
-
-                            ${escapeHTML(
-                                event.title
-                            )}
-
-                        </span>
-
-
-                        <span class="event-location">
-
-                            ${
-                                event.location
-                                    ? "📍 "
-                                      +
-                                      escapeHTML(
-                                          event.location
-                                      )
-                                    : ""
-                            }
-
-                        </span>
-
-
-                        <span class="event-time">
-
-                            ${event.start}
-                            –
-                            ${event.end}
-
-                        </span>
-
-                    `;
-
-
-                    card.addEventListener(
-                        "click",
-                        e => {
-
-                            e.stopPropagation();
-
-                            openEditEvent(
-                                event.id
-                            );
-
-                        }
-                    );
-
-
-                    cell.appendChild(
-                        card
-                    );
-
-                } else {
-
-                    /*
-                        Clicking an empty cell
-                        creates a new event.
-                    */
-
-                    cell.addEventListener(
-                        "click",
-                        () => {
-
-                            openNewEvent(
-
-                                dayIndex,
-
-                                `${String(hour).padStart(2, "0")}:00`
-
-                            );
-
-                        }
-                    );
-
-                }
+                    }
+                );
 
 
                 row.appendChild(
                     cell
                 );
-
             }
+
+
+            scheduleBody.appendChild(
+                row
+            );
+        }
+    );
+
+
+    updateDayHeaderDates();
+}
+
+
+/* =========================================
+   EVENT ELEMENT
+========================================= */
+
+function createEventElement(
+    event
+) {
+
+    const element =
+        document.createElement("div");
+
+    element.className =
+        "event";
+
+
+    element.style.background =
+        event.color || "#4f46e5";
+
+
+    const title =
+        document.createElement("div");
+
+    title.className =
+        "event-title";
+
+    title.textContent =
+        event.title;
+
+
+    const time =
+        document.createElement("div");
+
+    time.className =
+        "event-time";
+
+    time.textContent =
+        `${formatTime(event.start)} - ${formatTime(event.end)}`;
+
+
+    element.appendChild(
+        title
+    );
+
+    element.appendChild(
+        time
+    );
+
+
+    if (event.location) {
+
+        const location =
+            document.createElement("div");
+
+        location.className =
+            "event-location";
+
+        location.textContent =
+            `📍 ${event.location}`;
+
+        element.appendChild(
+            location
         );
-
-
-        tbody.appendChild(
-            row
-        );
-
     }
 
 
-    table.appendChild(
-        tbody
+    if (event.repeat === "weekly") {
+
+        const repeat =
+            document.createElement("div");
+
+        repeat.className =
+            "event-repeat";
+
+        repeat.textContent =
+            `↻ ${
+                translations[
+                    currentLanguage
+                ].repeatBadge
+            }`;
+
+        element.appendChild(
+            repeat
+        );
+    }
+
+
+    element.addEventListener(
+        "click",
+        eventObject => {
+
+            eventObject.stopPropagation();
+
+            openEditModal(
+                event.id
+            );
+        }
     );
 
 
-    $("scheduleContainer").innerHTML =
-        "";
-
-
-    $("scheduleContainer")
-        .appendChild(table);
-
+    return element;
 }
 
 
-/* =========================
-   NEW EVENT
-========================= */
+/* =========================================
+   DAY HEADER DATES
+========================================= */
 
-function openNewEvent(
+function updateDayHeaderDates() {
+
+    const start =
+        getDisplayedWeekStart();
+
+
+    document
+        .querySelectorAll(".day-name")
+        .forEach(
+            (element, index) => {
+
+                const date =
+                    new Date(start);
+
+                date.setDate(
+                    date.getDate() + index
+                );
+
+
+                const dayName =
+                    days[
+                        currentLanguage
+                    ][index];
+
+
+                element.textContent =
+                    `${dayName} ${date.getDate()}/${date.getMonth() + 1}`;
+            }
+        );
+}
+
+
+/* =========================================
+   OPEN ADD MODAL
+========================================= */
+
+function openAddModal(
     dayIndex = 0,
-    start = "09:00"
+    startTime = "09:00"
 ) {
 
-    $("eventForm").reset();
+    eventForm.reset();
 
 
-    $("eventId").value =
-        "";
+    eventId.value = "";
 
-
-    $("modalTitle").textContent =
-        t("newEvent");
-
-
-    $("dayInput").value =
+    eventDay.value =
         dayIndex;
 
-
-    $("startInput").value =
-        start;
-
-
-    const startMinutes =
-        timeToMinutes(start);
+    eventStart.value =
+        startTime;
 
 
-    const endMinutes =
+    const hour =
+        Number(
+            startTime.split(":")[0]
+        );
+
+
+    const endHour =
         Math.min(
-            startMinutes + 60,
-            23 * 60
+            hour + 1,
+            23
         );
 
 
-    $("endInput").value =
-        minutesToTime(
-            endMinutes
-        );
+    eventEnd.value =
+        `${String(endHour).padStart(2, "0")}:00`;
 
 
-    selectedColor =
-        COLORS[0];
+    eventRepeat.value =
+        "weekly";
 
 
-    $("deleteBtn").style.display =
-        "none";
+    eventColor.value =
+        "#4f46e5";
 
 
-    renderColors();
+    modalTitle.textContent =
+        translations[
+            currentLanguage
+        ].addEventTitle;
 
 
-    $("modalBackdrop")
-        .classList.add("open");
+    deleteEventBtn.classList.add(
+        "hidden"
+    );
+
+
+    eventModal.classList.remove(
+        "hidden"
+    );
 
 
     setTimeout(
-        () =>
-            $("titleInput").focus(),
+        () => eventTitle.focus(),
         100
     );
-
 }
 
 
-/* =========================
-   EDIT EVENT
-========================= */
+/* =========================================
+   OPEN EDIT MODAL
+========================================= */
 
-function openEditEvent(id) {
+function openEditModal(
+    id
+) {
 
     const event =
         events.find(
@@ -1166,609 +1184,584 @@ function openEditEvent(id) {
         );
 
 
-    if (!event) return;
+    if (!event) {
+
+        return;
+    }
 
 
-    $("eventId").value =
+    eventId.value =
         event.id;
 
-
-    $("modalTitle").textContent =
-        t("editEvent");
-
-
-    $("titleInput").value =
+    eventTitle.value =
         event.title;
 
+    eventDay.value =
+        event.dayIndex;
 
-    $("locationInput").value =
-        event.location || "";
-
-
-    $("startInput").value =
+    eventStart.value =
         event.start;
 
-
-    $("endInput").value =
+    eventEnd.value =
         event.end;
 
+    eventLocation.value =
+        event.location || "";
 
-    $("notesInput").value =
+    eventRepeat.value =
+        event.repeat || "weekly";
+
+    eventColor.value =
+        event.color || "#4f46e5";
+
+    eventNotes.value =
         event.notes || "";
 
 
-    const date =
-        new Date(
-            event.date
-            +
-            "T00:00:00"
-        );
+    modalTitle.textContent =
+        translations[
+            currentLanguage
+        ].editEventTitle;
 
 
-    let day =
-        date.getDay();
+    deleteEventBtn.classList.remove(
+        "hidden"
+    );
 
 
-    /*
-        JavaScript:
-        Sunday = 0
-        Monday = 1
-
-        Our schedule:
-        Monday = 0
-    */
-
-    day =
-        day === 0
-            ? 6
-            : day - 1;
-
-
-    $("dayInput").value =
-        day;
-
-
-    selectedColor =
-        event.color;
-
-
-    $("deleteBtn").style.display =
-        "block";
-
-
-    renderColors();
-
-
-    $("modalBackdrop")
-        .classList.add("open");
-
+    eventModal.classList.remove(
+        "hidden"
+    );
 }
 
 
-/* =========================
+/* =========================================
    CLOSE MODAL
-========================= */
+========================================= */
 
 function closeModal() {
 
-    $("modalBackdrop")
-        .classList.remove(
-            "open"
-        );
-
+    eventModal.classList.add(
+        "hidden"
+    );
 }
 
 
-$("closeModal")
-    .addEventListener(
-        "click",
-        closeModal
-    );
+/* =========================================
+   CONFLICT CHECK
+========================================= */
+
+function hasConflict(
+    newEvent,
+    ignoreId = null
+) {
+
+    const newStart =
+        timeToMinutes(
+            newEvent.start
+        );
+
+    const newEnd =
+        timeToMinutes(
+            newEvent.end
+        );
 
 
-$("cancelBtn")
-    .addEventListener(
-        "click",
-        closeModal
-    );
-
-
-$("modalBackdrop")
-    .addEventListener(
-        "click",
+    return events.some(
         event => {
 
             if (
-                event.target
-                ===
-                $("modalBackdrop")
+                event.id === ignoreId
             ) {
 
-                closeModal();
-
+                return false;
             }
 
+
+            if (
+                Number(
+                    event.dayIndex
+                ) !==
+                Number(
+                    newEvent.dayIndex
+                )
+            ) {
+
+                return false;
+            }
+
+
+            /*
+               For weekly schedules,
+               compare with weekly events.
+
+               Once-only events are also
+               compared when on the same
+               week/day.
+            */
+
+            if (
+                newEvent.repeat === "once" &&
+                event.repeat === "once"
+            ) {
+
+                if (
+                    event.date !==
+                    newEvent.date
+                ) {
+
+                    return false;
+                }
+            }
+
+
+            const existingStart =
+                timeToMinutes(
+                    event.start
+                );
+
+            const existingEnd =
+                timeToMinutes(
+                    event.end
+                );
+
+
+            return (
+                newStart < existingEnd &&
+                newEnd > existingStart
+            );
         }
     );
+}
 
 
-/* =========================
-   SAVE EVENT
-========================= */
+/* =========================================
+   SAVE FORM
+========================================= */
 
-$("eventForm")
-    .addEventListener(
-        "submit",
-        event => {
+eventForm.addEventListener(
+    "submit",
+    function (e) {
 
-            event.preventDefault();
-
-
-            const title =
-                $("titleInput")
-                    .value
-                    .trim();
+        e.preventDefault();
 
 
-            const location =
-                $("locationInput")
-                    .value
-                    .trim();
+        const start =
+            eventStart.value;
+
+        const end =
+            eventEnd.value;
 
 
-            const start =
-                $("startInput").value;
+        if (
+            timeToMinutes(end) <=
+            timeToMinutes(start)
+        ) {
+
+            showToast(
+                translations[
+                    currentLanguage
+                ].invalidTime
+            );
+
+            return;
+        }
 
 
-            const end =
-                $("endInput").value;
+        const id =
+            eventId.value ||
+            generateId();
 
 
-            const notes =
-                $("notesInput")
-                    .value
-                    .trim();
+        /*
+           For weekly events:
+
+           dayIndex is the permanent
+           weekday.
+
+           There is NO specific date.
+
+           Therefore the event repeats
+           forever until deleted.
+        */
 
 
-            const dayIndex =
-                Number(
-                    $("dayInput").value
-                );
+        let date = null;
 
 
-            /* CHECK TIME */
+        /*
+           Once-only events are attached
+           to the currently displayed week.
+        */
 
-            if (
-                timeToMinutes(end)
-                <=
-                timeToMinutes(start)
-            ) {
-
-                showToast(
-                    t("invalidTime")
-                );
-
-                return;
-
-            }
-
-
-            /* DATE */
+        if (
+            eventRepeat.value ===
+            "once"
+        ) {
 
             const weekStart =
-                getWeekStart();
+                getDisplayedWeekStart();
 
 
-            const date =
-                new Date(
-                    weekStart
-                );
+            const selectedDate =
+                new Date(weekStart);
 
-
-            date.setDate(
-                date.getDate()
-                +
-                dayIndex
+            selectedDate.setDate(
+                selectedDate.getDate() +
+                Number(eventDay.value)
             );
 
 
-            const newEvent = {
-
-                id:
-                    $("eventId").value
-                    ||
-                    crypto.randomUUID(),
-
-                title,
-
-                location,
-
-                start,
-
-                end,
-
-                notes,
-
-                date:
-                    dateKey(date),
-
-                color:
-                    selectedColor
-
-            };
-
-
-            /* =====================
-               CONFLICT CHECK
-            ===================== */
-
-            const conflict =
-                events.some(
-                    existing => {
-
-                        if (
-                            existing.id
-                            ===
-                            newEvent.id
-                        ) {
-
-                            return false;
-
-                        }
-
-
-                        if (
-                            existing.date
-                            !==
-                            newEvent.date
-                        ) {
-
-                            return false;
-
-                        }
-
-
-                        return (
-
-                            timeToMinutes(
-                                newEvent.start
-                            )
-                            <
-                            timeToMinutes(
-                                existing.end
-                            )
-
-                            &&
-
-                            timeToMinutes(
-                                newEvent.end
-                            )
-                            >
-                            timeToMinutes(
-                                existing.start
-                            )
-
-                        );
-
-                    }
+            date =
+                getDateString(
+                    selectedDate
                 );
+        }
 
 
-            if (conflict) {
+        const newEvent = {
 
-                const answer =
-                    confirm(
-                        t("conflict")
-                        +
-                        "\n\n"
-                        +
-                        (
-                            settings.language
-                            ===
-                            "ar"
+            id,
 
-                                ?
+            title:
+                eventTitle.value.trim(),
 
-                                "هل تريد الحفظ على أي حال؟"
+            dayIndex:
+                Number(
+                    eventDay.value
+                ),
 
-                                :
+            start,
 
-                                "Save anyway?"
-                        )
-                    );
+            end,
 
+            location:
+                eventLocation.value.trim(),
 
-                if (!answer) {
+            repeat:
+                eventRepeat.value,
 
-                    return;
+            color:
+                eventColor.value,
 
-                }
+            notes:
+                eventNotes.value.trim(),
 
-            }
+            date
 
-
-            /* =====================
-               SAVE
-            ===================== */
-
-            const existingIndex =
-                events.findIndex(
-                    item =>
-                        item.id
-                        ===
-                        newEvent.id
-                );
+        };
 
 
-            if (
-                existingIndex >= 0
-            ) {
-
-                events[
-                    existingIndex
-                ] =
-                    newEvent;
-
-            } else {
-
-                events.push(
-                    newEvent
-                );
-
-            }
-
-
-            saveEvents();
-
-            closeModal();
-
-            render();
+        if (
+            hasConflict(
+                newEvent,
+                eventId.value || null
+            )
+        ) {
 
             showToast(
-                t("saved")
+                translations[
+                    currentLanguage
+                ].conflict
             );
 
+            return;
         }
-    );
 
 
-/* =========================
-   DELETE
-========================= */
+        const existingIndex =
+            events.findIndex(
+                event =>
+                    event.id === id
+            );
 
-$("deleteBtn")
+
+        if (
+            existingIndex !== -1
+        ) {
+
+            events[
+                existingIndex
+            ] = newEvent;
+
+        } else {
+
+            events.push(
+                newEvent
+            );
+        }
+
+
+        saveEvents();
+
+        renderSchedule();
+
+        closeModal();
+
+
+        showToast(
+            translations[
+                currentLanguage
+            ].saved
+        );
+    }
+);
+
+
+/* =========================================
+   DELETE EVENT
+========================================= */
+
+deleteEventBtn.addEventListener(
+    "click",
+    () => {
+
+        const id =
+            eventId.value;
+
+
+        if (!id) {
+
+            return;
+        }
+
+
+        const confirmed =
+            confirm(
+                translations[
+                    currentLanguage
+                ].confirmDelete
+            );
+
+
+        if (!confirmed) {
+
+            return;
+        }
+
+
+        events =
+            events.filter(
+                event =>
+                    event.id !== id
+            );
+
+
+        saveEvents();
+
+        renderSchedule();
+
+        closeModal();
+
+
+        showToast(
+            translations[
+                currentLanguage
+            ].deleted
+        );
+    }
+);
+
+
+/* =========================================
+   ADD EVENT BUTTON
+========================================= */
+
+document
+    .getElementById("addEventBtn")
     .addEventListener(
         "click",
         () => {
 
-            const id =
-                $("eventId").value;
+            openAddModal();
+        }
+    );
 
 
-            if (!id) return;
+/* =========================================
+   CLOSE BUTTON
+========================================= */
+
+document
+    .getElementById("closeModalBtn")
+    .addEventListener(
+        "click",
+        closeModal
+    );
 
 
-            events =
-                events.filter(
-                    event =>
-                        event.id !== id
-                );
+document
+    .getElementById("cancelBtn")
+    .addEventListener(
+        "click",
+        closeModal
+    );
 
 
-            saveEvents();
+/* =========================================
+   CLICK OUTSIDE MODAL
+========================================= */
+
+eventModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            eventModal
+        ) {
 
             closeModal();
-
-            render();
-
-            showToast(
-                t("deleted")
-            );
-
         }
-    );
+    }
+);
 
 
-/* =========================
-   NAVIGATION
-========================= */
+/* =========================================
+   ESCAPE KEY
+========================================= */
 
-$("previousWeek")
-    .addEventListener(
-        "click",
-        () => {
+document.addEventListener(
+    "keydown",
+    event => {
 
-            weekOffset--;
+        if (
+            event.key === "Escape"
+        ) {
 
-            render();
-
+            closeModal();
         }
-    );
+    }
+);
 
 
-$("nextWeek")
-    .addEventListener(
-        "click",
-        () => {
-
-            weekOffset++;
-
-            render();
-
-        }
-    );
-
-
-$("todayBtn")
-    .addEventListener(
-        "click",
-        () => {
-
-            weekOffset = 0;
-
-            render();
-
-        }
-    );
-
-
-/* =========================
-   ADD BUTTON
-========================= */
-
-$("addEventBtn")
-    .addEventListener(
-        "click",
-        () =>
-            openNewEvent()
-    );
-
-
-$("emptyAddBtn")
-    .addEventListener(
-        "click",
-        () =>
-            openNewEvent()
-    );
-
-
-/* =========================
+/* =========================================
    LANGUAGE
-========================= */
+========================================= */
 
-$("languageBtn")
+document
+    .getElementById("languageBtn")
     .addEventListener(
         "click",
         () => {
 
-            settings.language =
-                settings.language === "en"
+            currentLanguage =
+                currentLanguage === "en"
                     ? "ar"
                     : "en";
 
 
             saveSettings();
 
-            applyLanguage();
-
+            applySettings();
         }
     );
 
 
-/* =========================
-   DARK MODE
-========================= */
+/* =========================================
+   THEME
+========================================= */
 
-$("themeBtn")
+document
+    .getElementById("themeBtn")
     .addEventListener(
         "click",
         () => {
 
-            settings.theme =
-                settings.theme === "dark"
-                    ? "light"
-                    : "dark";
+            darkMode =
+                !darkMode;
 
 
             saveSettings();
 
-            applyTheme();
-
+            applySettings();
         }
     );
 
 
-function applyTheme() {
+/* =========================================
+   WEEK NAVIGATION
+========================================= */
 
-    document.documentElement
-        .dataset.theme =
-            settings.theme;
+document
+    .getElementById("previousWeekBtn")
+    .addEventListener(
+        "click",
+        () => {
 
-}
+            weekOffset--;
 
+            updateWeekLabel();
 
-applyTheme();
-
-
-/* =========================
-   MINUTES → TIME
-========================= */
-
-function minutesToTime(minutes) {
-
-    const hours =
-        Math.floor(
-            minutes / 60
-        );
+            renderSchedule();
+        }
+    );
 
 
-    const mins =
-        minutes % 60;
+document
+    .getElementById("nextWeekBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            weekOffset++;
+
+            updateWeekLabel();
+
+            renderSchedule();
+        }
+    );
+
+
+document
+    .getElementById("todayBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            weekOffset = 0;
+
+            updateWeekLabel();
+
+            renderSchedule();
+        }
+    );
+
+
+/* =========================================
+   ID GENERATOR
+========================================= */
+
+function generateId() {
+
+    if (
+        window.crypto &&
+        crypto.randomUUID
+    ) {
+
+        return crypto.randomUUID();
+    }
 
 
     return (
-
-        String(hours)
-            .padStart(2, "0")
-
-        +
-
-        ":"
-
-        +
-
-        String(mins)
-            .padStart(2, "0")
-
+        Date.now().toString(36) +
+        Math.random()
+            .toString(36)
+            .substring(2)
     );
-
 }
 
 
-/* =========================
-   ESCAPE HTML
-========================= */
-
-function escapeHTML(value = "") {
-
-    return value.replace(
-        /[&<>"']/g,
-        character => {
-
-            const characters = {
-
-                "&": "&amp;",
-
-                "<": "&lt;",
-
-                ">": "&gt;",
-
-                '"': "&quot;",
-
-                "'": "&#039;"
-
-            };
-
-
-            return characters[
-                character
-            ];
-
-        }
-    );
-
-}
-
-
-/* =========================
+/* =========================================
    TOAST
-========================= */
+========================================= */
 
-function showToast(message) {
+let toastTimer = null;
 
-    const toast =
-        $("toast");
 
+function showToast(
+    message
+) {
 
     toast.textContent =
         message;
@@ -1780,11 +1773,11 @@ function showToast(message) {
 
 
     clearTimeout(
-        window.toastTimer
+        toastTimer
     );
 
 
-    window.toastTimer =
+    toastTimer =
         setTimeout(
             () => {
 
@@ -1793,23 +1786,13 @@ function showToast(message) {
                 );
 
             },
-
-            2200
+            2500
         );
-
 }
 
 
-/* =========================
-   START
-========================= */
+/* =========================================
+   START APP
+========================================= */
 
-renderDaySelect();
-
-renderColors();
-
-applyLanguage();
-
-applyTheme();
-
-render();
+loadData();

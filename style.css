@@ -1,107 +1,116 @@
+/* =========================================
+   RESET
+========================================= */
+
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 
 :root {
 
-    --bg: #f4f6f8;
+    --bg: #f5f7fb;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
 
-    --card: #ffffff;
-
-    --cell: #ffffff;
-
-    --cell-hover: #f1f5ff;
-
-    --text: #172033;
-
+    --text: #111827;
     --muted: #6b7280;
 
-    --border: #dfe3e8;
+    --border: #e5e7eb;
 
-    --primary: #2563eb;
-
-    --primary-dark: #1d4ed8;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
 
     --danger: #dc2626;
+    --danger-hover: #b91c1c;
 
-    --time-width: 80px;
+    --shadow:
+        0 10px 30px rgba(0, 0, 0, 0.08);
 
+    --radius: 12px;
 }
 
 
-/* =========================
+/* =========================================
    DARK MODE
-========================= */
+========================================= */
 
-[data-theme="dark"] {
+body.dark {
 
-    --bg: #0b1120;
+    --bg: #0f172a;
+    --surface: #111827;
+    --surface-2: #1f2937;
 
-    --card: #111827;
-
-    --cell: #111827;
-
-    --cell-hover: #172033;
-
-    --text: #f3f4f6;
-
+    --text: #f9fafb;
     --muted: #9ca3af;
 
-    --border: #263244;
+    --border: #374151;
 
+    --shadow:
+        0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 
-/* =========================
+/* =========================================
    BODY
-========================= */
+========================================= */
 
-html,
 body {
 
-    margin: 0;
-
-    min-height: 100%;
-
     font-family:
-
-        Arial,
-
-        Helvetica,
-
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
         sans-serif;
 
     background: var(--bg);
 
     color: var(--text);
 
+    min-height: 100vh;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
 }
 
 
-body {
-
-    padding: 20px;
-
+button,
+input,
+select,
+textarea {
+    font: inherit;
 }
 
 
-/* =========================
+button {
+    cursor: pointer;
+}
+
+
+/* =========================================
    APP
-========================= */
+========================================= */
 
 .app {
 
-    max-width: 1400px;
+    width: 100%;
 
-    margin: auto;
+    max-width: 1500px;
 
+    margin: 0 auto;
+
+    padding: 24px;
 }
 
 
-/* =========================
+/* =========================================
    HEADER
-========================= */
+========================================= */
 
 .header {
 
@@ -113,106 +122,29 @@ body {
 
     gap: 20px;
 
-    margin-bottom: 20px;
-
+    margin-bottom: 24px;
 }
 
 
 .header h1 {
 
-    margin: 0;
-
     font-size: 28px;
 
+    font-weight: 750;
+
+    margin-bottom: 5px;
 }
 
 
 .header p {
 
-    margin: 5px 0 0;
-
     color: var(--muted);
 
+    font-size: 14px;
 }
 
 
-.header-buttons {
-
-    display: flex;
-
-    gap: 8px;
-
-}
-
-
-/* =========================
-   BUTTONS
-========================= */
-
-button {
-
-    font: inherit;
-
-    cursor: pointer;
-
-}
-
-
-.primary-btn,
-.secondary-btn {
-
-    min-height: 40px;
-
-    padding: 0 14px;
-
-    border-radius: 8px;
-
-    font-weight: 600;
-
-}
-
-
-.primary-btn {
-
-    background: var(--primary);
-
-    border: 1px solid var(--primary);
-
-    color: white;
-
-}
-
-
-.primary-btn:hover {
-
-    background: var(--primary-dark);
-
-}
-
-
-.secondary-btn {
-
-    background: var(--card);
-
-    border: 1px solid var(--border);
-
-    color: var(--text);
-
-}
-
-
-.secondary-btn:hover {
-
-    background: var(--cell-hover);
-
-}
-
-
-/* =========================
-   CONTROLS
-========================= */
-
-.controls {
+.header-actions {
 
     display: flex;
 
@@ -220,142 +152,203 @@ button {
 
     gap: 8px;
 
-    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
 
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.primary-btn,
+.secondary-btn,
+.control-btn,
+.danger-btn {
+
+    border: none;
+
+    border-radius: 9px;
+
+    padding: 10px 15px;
+
+    font-weight: 600;
+
+    transition:
+        0.2s ease;
+
+    white-space: nowrap;
+}
+
+
+.primary-btn {
+
+    background: var(--primary);
+
+    color: white;
+}
+
+
+.primary-btn:hover {
+
+    background: var(--primary-hover);
+
+    transform: translateY(-1px);
+}
+
+
+.secondary-btn,
+.control-btn {
+
+    background: var(--surface);
+
+    color: var(--text);
+
+    border: 1px solid var(--border);
+}
+
+
+.secondary-btn:hover,
+.control-btn:hover {
+
+    background: var(--surface-2);
+}
+
+
+.danger-btn {
+
+    background: var(--danger);
+
+    color: white;
+}
+
+
+.danger-btn:hover {
+
+    background: var(--danger-hover);
+}
+
+
+.hidden {
+
+    display: none !important;
+}
+
+
+/* =========================================
+   WEEK CONTROLS
+========================================= */
+
+.week-controls {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 18px;
+
+    flex-wrap: wrap;
 }
 
 
 .week-label {
 
-    flex: 1;
+    min-width: 220px;
 
     text-align: center;
 
     font-weight: 700;
 
+    color: var(--text);
 }
 
 
-/* =========================
-   TABLE CONTAINER
-========================= */
+/* =========================================
+   TABLE
+========================================= */
 
-.schedule-container {
+.schedule-wrapper {
 
-    width: 100%;
-
-    overflow-x: auto;
-
-    background: var(--card);
+    background: var(--surface);
 
     border: 1px solid var(--border);
 
-    border-radius: 10px;
+    border-radius: var(--radius);
 
+    box-shadow: var(--shadow);
+
+    overflow: hidden;
 }
 
 
-/* =========================
-   TABLE
-========================= */
+.table-scroll {
 
-.schedule-table {
+    overflow-x: auto;
+
+    width: 100%;
+}
+
+
+table {
 
     width: 100%;
 
-    min-width: 850px;
+    min-width: 1050px;
 
     border-collapse: collapse;
 
     table-layout: fixed;
-
 }
 
 
-/* =========================
-   TABLE HEADER
-========================= */
+thead th {
 
-.schedule-table th {
+    background: var(--surface-2);
 
-    height: 60px;
-
-    background: var(--card);
-
-    border-right: 1px solid var(--border);
-
-    border-bottom: 2px solid var(--border);
-
-    text-align: center;
+    color: var(--text);
 
     font-size: 14px;
 
-}
+    font-weight: 700;
 
-
-.schedule-table th:first-child {
-
-    width: var(--time-width);
-
-}
-
-
-.schedule-table th.today {
-
-    background: var(--primary);
-
-    color: white;
-
-}
-
-
-.day-number {
-
-    display: block;
-
-    font-size: 20px;
-
-    margin-top: 3px;
-
-}
-
-
-/* =========================
-   TIME COLUMN
-========================= */
-
-.time-cell {
-
-    width: var(--time-width);
-
-    text-align: center;
-
-    font-size: 12px;
-
-    color: var(--muted);
-
-    background: var(--card);
-
-    border-right: 1px solid var(--border);
+    padding: 14px 10px;
 
     border-bottom: 1px solid var(--border);
 
-    font-weight: 600;
+    border-right: 1px solid var(--border);
 
+    text-align: center;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 5;
 }
 
 
-/* =========================
-   SCHEDULE CELL
-========================= */
+thead th:last-child {
 
-.schedule-cell {
+    border-right: none;
+}
+
+
+.time-column {
+
+    width: 90px;
+}
+
+
+/* =========================================
+   TABLE CELLS
+========================================= */
+
+tbody td {
 
     height: 72px;
-
-    padding: 4px;
-
-    background: var(--cell);
 
     border-right: 1px solid var(--border);
 
@@ -363,67 +356,114 @@ button {
 
     vertical-align: top;
 
+    position: relative;
+
+    padding: 5px;
+}
+
+
+tbody td:last-child {
+
+    border-right: none;
+}
+
+
+.time-cell {
+
+    text-align: center;
+
+    vertical-align: middle;
+
+    color: var(--muted);
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    background: var(--surface-2);
+
+    padding: 5px !important;
+}
+
+
+.schedule-cell {
+
     cursor: pointer;
 
-    transition: background 0.15s;
-
+    transition:
+        background 0.15s ease;
 }
 
 
 .schedule-cell:hover {
 
-    background: var(--cell-hover);
-
+    background: rgba(79, 70, 229, 0.04);
 }
 
 
-/* =========================
-   EVENT INSIDE CELL
-========================= */
+/* =========================================
+   EVENT
+========================================= */
 
-.event-card {
+.event {
 
     width: 100%;
 
-    height: 100%;
+    min-height: 60px;
 
-    padding: 7px;
+    border-radius: 8px;
 
-    border-radius: 7px;
+    padding: 8px;
 
     color: white;
-
-    text-align: left;
 
     overflow: hidden;
 
     cursor: pointer;
 
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.12);
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+
+.event:hover {
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 12px rgba(0, 0, 0, 0.18);
 }
 
 
 .event-title {
 
-    display: block;
-
     font-size: 13px;
 
-    font-weight: 700;
+    font-weight: 750;
 
-    white-space: nowrap;
+    line-height: 1.2;
 
-    overflow: hidden;
+    margin-bottom: 5px;
 
-    text-overflow: ellipsis;
+    word-break: break-word;
+}
 
+
+.event-time {
+
+    font-size: 11px;
+
+    opacity: 0.9;
+
+    margin-bottom: 3px;
 }
 
 
 .event-location {
-
-    display: block;
-
-    margin-top: 4px;
 
     font-size: 11px;
 
@@ -434,109 +474,87 @@ button {
     overflow: hidden;
 
     text-overflow: ellipsis;
-
 }
 
 
-.event-time {
+.event-repeat {
 
-    display: block;
+    display: inline-block;
 
-    margin-top: 3px;
+    margin-top: 4px;
 
-    font-size: 10px;
+    font-size: 9px;
 
-    opacity: 0.85;
+    padding: 2px 5px;
 
+    border-radius: 4px;
+
+    background: rgba(255, 255, 255, 0.2);
 }
 
 
-/* =========================
-   EMPTY STATE
-========================= */
+/* =========================================
+   TABLE HINT
+========================================= */
 
-.empty-state {
+.table-hint {
 
-    display: none;
+    padding: 12px 15px;
 
     text-align: center;
 
-    padding: 60px 20px;
-
-}
-
-
-.empty-icon {
-
-    font-size: 45px;
-
-}
-
-
-.empty-state h2 {
-
-    margin: 10px 0 5px;
-
-}
-
-
-.empty-state p {
-
     color: var(--muted);
 
-    margin-bottom: 18px;
+    font-size: 12px;
 
+    border-top: 1px solid var(--border);
 }
 
 
-/* =========================
+/* =========================================
    MODAL
-========================= */
+========================================= */
 
-.modal-backdrop {
+.modal {
 
     position: fixed;
 
     inset: 0;
 
-    z-index: 100;
-
-    display: none;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 15px;
-
     background: rgba(0, 0, 0, 0.55);
-
-}
-
-
-.modal-backdrop.open {
 
     display: flex;
 
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 20px;
+
+    z-index: 100;
 }
 
 
-.modal {
+.modal-content {
 
-    width: min(500px, 100%);
+    width: 100%;
+
+    max-width: 520px;
 
     max-height: 90vh;
 
     overflow-y: auto;
 
-    padding: 22px;
+    background: var(--surface);
 
-    background: var(--card);
+    color: var(--text);
 
     border-radius: 14px;
 
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.3);
 
+    padding: 22px;
 }
 
 
@@ -546,32 +564,21 @@ button {
 
     justify-content: space-between;
 
-    align-items: flex-start;
+    align-items: center;
 
     margin-bottom: 20px;
-
 }
 
 
 .modal-header h2 {
 
-    margin: 0;
-
-}
-
-
-.modal-header p {
-
-    color: var(--muted);
-
-    font-size: 13px;
-
+    font-size: 21px;
 }
 
 
 .close-btn {
 
-    border: 0;
+    border: none;
 
     background: transparent;
 
@@ -579,129 +586,106 @@ button {
 
     font-size: 28px;
 
+    line-height: 1;
+
+    cursor: pointer;
 }
 
 
-/* =========================
+.close-btn:hover {
+
+    color: var(--text);
+}
+
+
+/* =========================================
    FORM
-========================= */
+========================================= */
 
-.modal label {
+.form-group {
 
-    display: block;
-
-    margin-bottom: 14px;
-
-    font-size: 13px;
-
-    font-weight: 700;
-
+    margin-bottom: 16px;
 }
 
 
-.modal label span {
+.form-group label {
 
     display: block;
 
     margin-bottom: 6px;
 
+    font-size: 13px;
+
+    font-weight: 650;
 }
 
 
-.modal input,
-.modal select,
-.modal textarea {
+.form-group input,
+.form-group select,
+.form-group textarea {
 
     width: 100%;
 
-    padding: 10px;
-
     border: 1px solid var(--border);
 
-    border-radius: 7px;
-
-    background: var(--cell);
+    background: var(--surface);
 
     color: var(--text);
 
+    border-radius: 8px;
+
+    padding: 10px 11px;
+
     outline: none;
 
+    transition:
+        border 0.15s ease,
+        box-shadow 0.15s ease;
 }
 
 
-.modal textarea {
-
-    resize: vertical;
-
-}
-
-
-.modal input:focus,
-.modal select:focus,
-.modal textarea:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
 
     border-color: var(--primary);
 
+    box-shadow:
+        0 0 0 3px rgba(79, 70, 229, 0.12);
 }
 
 
-/* =========================
-   TWO COLUMNS
-========================= */
+.form-group textarea {
 
-.two-columns {
+    resize: vertical;
+}
+
+
+.form-row {
 
     display: grid;
 
     grid-template-columns: 1fr 1fr;
 
     gap: 12px;
-
 }
 
 
-/* =========================
-   COLORS
-========================= */
+input[type="color"] {
 
-.color-row {
+    height: 42px;
 
-    display: flex;
+    padding: 4px;
 
-    gap: 9px;
-
-    flex-wrap: wrap;
-
+    cursor: pointer;
 }
 
 
-.color-choice {
+/* =========================================
+   FORM ACTIONS
+========================================= */
 
-    width: 28px;
-
-    height: 28px;
-
-    border-radius: 50%;
-
-    border: 3px solid transparent;
-
-}
-
-
-.color-choice.selected {
-
-    border-color: var(--text);
-
-    transform: scale(1.1);
-
-}
-
-
-/* =========================
-   MODAL ACTIONS
-========================= */
-
-.modal-actions {
+.form-actions {
 
     display: flex;
 
@@ -709,67 +693,53 @@ button {
 
     align-items: center;
 
-    margin-top: 20px;
+    gap: 10px;
 
+    margin-top: 22px;
 }
 
 
-.modal-actions > div {
+.form-actions-right {
 
     display: flex;
 
     gap: 8px;
-
 }
 
 
-.delete-btn {
-
-    border: 1px solid #fecaca;
-
-    background: transparent;
-
-    color: var(--danger);
-
-    padding: 9px 13px;
-
-    border-radius: 7px;
-
-    font-weight: 700;
-
-}
-
-
-/* =========================
+/* =========================================
    TOAST
-========================= */
+========================================= */
 
 .toast {
 
     position: fixed;
 
-    left: 50%;
-
     bottom: 25px;
 
-    transform: translate(-50%, 20px);
+    left: 50%;
 
-    padding: 10px 16px;
+    transform:
+        translate(-50%, 100px);
 
     background: #111827;
 
     color: white;
 
+    padding: 11px 18px;
+
     border-radius: 8px;
+
+    font-size: 13px;
 
     opacity: 0;
 
     pointer-events: none;
 
-    transition: 0.2s;
+    transition:
+        0.25s ease;
 
     z-index: 200;
-
 }
 
 
@@ -777,154 +747,179 @@ button {
 
     opacity: 1;
 
-    transform: translate(-50%, 0);
-
+    transform:
+        translate(-50%, 0);
 }
 
 
-/* =========================
-   ARABIC
-========================= */
+/* =========================================
+   RTL / ARABIC
+========================================= */
 
-[dir="rtl"] {
+body.rtl {
 
     direction: rtl;
-
 }
 
 
-[dir="rtl"] .event-card {
+body.rtl .header {
+
+    direction: rtl;
+}
+
+
+body.rtl .event {
 
     text-align: right;
-
 }
 
 
-/* =========================
+body.rtl .modal-header {
+
+    direction: rtl;
+}
+
+
+body.rtl .form-actions {
+
+    direction: rtl;
+}
+
+
+body.rtl .week-controls {
+
+    direction: rtl;
+}
+
+
+/* =========================================
    MOBILE
-========================= */
+========================================= */
 
 @media (max-width: 700px) {
 
-    body {
+    .app {
 
-        padding: 10px;
-
+        padding: 14px;
     }
 
 
     .header {
 
-        align-items: flex-start;
+        flex-direction: column;
 
+        align-items: stretch;
+
+        text-align: center;
     }
 
 
     .header h1 {
 
-        font-size: 22px;
-
+        font-size: 23px;
     }
 
 
-    .header p {
+    .header-actions {
 
-        font-size: 12px;
-
+        justify-content: center;
     }
 
 
-    .header-buttons {
+    .week-controls {
 
-        flex-wrap: wrap;
-
-        justify-content: flex-end;
-
-    }
-
-
-    .controls {
-
-        flex-wrap: wrap;
-
+        gap: 6px;
     }
 
 
     .week-label {
 
-        order: -1;
-
         width: 100%;
 
-        flex-basis: 100%;
+        order: -1;
 
         margin-bottom: 5px;
-
     }
 
 
-    .schedule-container {
+    .control-btn {
 
-        overflow-x: auto;
+        padding: 8px 11px;
 
-        -webkit-overflow-scrolling: touch;
-
+        font-size: 12px;
     }
 
 
-    .schedule-table {
+    .primary-btn,
+    .secondary-btn {
 
-        min-width: 800px;
+        padding: 9px 12px;
 
+        font-size: 13px;
     }
 
 
     .modal {
 
-        padding: 17px;
+        padding: 10px;
 
+        align-items: flex-end;
     }
 
+
+    .modal-content {
+
+        max-height: 92vh;
+
+        border-radius: 14px 14px 0 0;
+
+        padding: 18px;
+    }
+
+
+    .form-row {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .form-actions {
+
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+
+    .form-actions-right {
+
+        width: 100%;
+    }
+
+
+    .form-actions-right button {
+
+        flex: 1;
+    }
 }
 
 
-/* =========================
-   SMALL PHONE
-========================= */
+/* =========================================
+   VERY SMALL PHONES
+========================================= */
 
-@media (max-width: 450px) {
+@media (max-width: 400px) {
 
-    .header-buttons {
+    .header-actions {
 
-        gap: 5px;
+        display: grid;
 
+        grid-template-columns: 1fr 1fr;
     }
 
 
-    .header-buttons .primary-btn {
+    .header-actions .primary-btn {
 
-        padding: 0 9px;
-
-        font-size: 12px;
-
+        grid-column: 1 / -1;
     }
-
-
-    .header-buttons .secondary-btn {
-
-        padding: 0 9px;
-
-        font-size: 12px;
-
-    }
-
-
-    .two-columns {
-
-        grid-template-columns: 1fr;
-
-        gap: 0;
-
-    }
-
 }

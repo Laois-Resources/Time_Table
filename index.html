@@ -1,367 +1,350 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-
+<html lang="en">
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <title>Weekly Timetable</title>
 
-    <title>Weekly Schedule</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
+    <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
-<div class="app">
+    <div class="app">
 
-    <!-- HEADER -->
+        <!-- HEADER -->
+        <header class="header">
 
-    <header class="header">
+            <div>
+                <h1 id="appTitle">Weekly Timetable</h1>
+                <p id="appSubtitle">
+                    Your simple weekly schedule
+                </p>
+            </div>
 
-        <div>
+            <div class="header-actions">
+                <button id="languageBtn" class="secondary-btn">
+                    العربية
+                </button>
 
-            <h1 id="appTitle">
+                <button id="themeBtn" class="secondary-btn">
+                    🌙
+                </button>
+
+                <button id="addEventBtn" class="primary-btn">
+                    + <span id="addEventText">Add Event</span>
+                </button>
+            </div>
+
+        </header>
+
+
+        <!-- WEEK CONTROLS -->
+        <section class="week-controls">
+
+            <button id="previousWeekBtn" class="control-btn">
+                ← <span id="previousText">Previous</span>
+            </button>
+
+            <button id="todayBtn" class="control-btn">
+                <span id="todayText">Today</span>
+            </button>
+
+            <div id="weekLabel" class="week-label">
                 Weekly Schedule
-            </h1>
+            </div>
 
-            <p id="appSubtitle">
-                Your weekly timetable
-            </p>
-
-        </div>
-
-
-        <div class="header-buttons">
-
-            <button
-                id="languageBtn"
-                class="secondary-btn"
-            >
-                العربية
+            <button id="nextWeekBtn" class="control-btn">
+                <span id="nextText">Next</span> →
             </button>
 
-
-            <button
-                id="themeBtn"
-                class="secondary-btn"
-            >
-                ◐
-            </button>
+        </section>
 
 
-            <button
-                id="addEventBtn"
-                class="primary-btn"
-            >
-                + <span data-i18n="addEvent">
-                    Add Event
-                </span>
-            </button>
+        <!-- TABLE -->
+        <main class="schedule-wrapper">
 
-        </div>
+            <div class="table-scroll">
 
-    </header>
+                <table id="scheduleTable">
 
+                    <thead>
+                        <tr>
+                            <th class="time-column" id="timeHeader">
+                                Time
+                            </th>
 
-    <!-- WEEK CONTROLS -->
+                            <th>
+                                <span class="day-name" data-day="0">
+                                    Monday
+                                </span>
+                            </th>
 
-    <div class="controls">
+                            <th>
+                                <span class="day-name" data-day="1">
+                                    Tuesday
+                                </span>
+                            </th>
 
-        <button
-            id="previousWeek"
-            class="secondary-btn"
-        >
-            ‹
-            <span data-i18n="previous">
-                Previous
-            </span>
-        </button>
+                            <th>
+                                <span class="day-name" data-day="2">
+                                    Wednesday
+                                </span>
+                            </th>
 
+                            <th>
+                                <span class="day-name" data-day="3">
+                                    Thursday
+                                </span>
+                            </th>
 
-        <button
-            id="todayBtn"
-            class="secondary-btn"
-            data-i18n="today"
-        >
-            Today
-        </button>
+                            <th>
+                                <span class="day-name" data-day="4">
+                                    Friday
+                                </span>
+                            </th>
 
+                            <th>
+                                <span class="day-name" data-day="5">
+                                    Saturday
+                                </span>
+                            </th>
 
-        <button
-            id="nextWeek"
-            class="secondary-btn"
-        >
-            <span data-i18n="next">
-                Next
-            </span>
-            ›
-        </button>
+                            <th>
+                                <span class="day-name" data-day="6">
+                                    Sunday
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
 
+                    <tbody id="scheduleBody"></tbody>
 
-        <div
-            id="weekLabel"
-            class="week-label"
-        ></div>
+                </table>
+
+            </div>
+
+            <div class="table-hint" id="tableHint">
+                Click an empty time slot to add an event.
+            </div>
+
+        </main>
 
     </div>
 
 
-    <!-- SCHEDULE -->
+    <!-- ADD / EDIT MODAL -->
+    <div id="eventModal" class="modal hidden">
 
-    <main>
+        <div class="modal-content">
 
-        <div
-            id="scheduleContainer"
-            class="schedule-container"
-        ></div>
-
-
-        <div
-            id="emptyState"
-            class="empty-state"
-        >
-
-            <div class="empty-icon">
-                📅
-            </div>
-
-            <h2 data-i18n="emptyTitle">
-                Your schedule is empty
-            </h2>
-
-            <p data-i18n="emptyText">
-                Click a time slot or Add Event to begin.
-            </p>
-
-            <button
-                id="emptyAddBtn"
-                class="primary-btn"
-                data-i18n="addEvent"
-            >
-                Add Event
-            </button>
-
-        </div>
-
-    </main>
-
-</div>
-
-
-<!-- EVENT MODAL -->
-
-<div
-    id="modalBackdrop"
-    class="modal-backdrop"
->
-
-    <form
-        id="eventForm"
-        class="modal"
-    >
-
-        <div class="modal-header">
-
-            <div>
+            <div class="modal-header">
 
                 <h2 id="modalTitle">
-                    New Event
+                    Add Event
                 </h2>
 
-                <p data-i18n="eventHint">
-                    Add your schedule details.
-                </p>
-
-            </div>
-
-
-            <button
-                type="button"
-                id="closeModal"
-                class="close-btn"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <input
-            type="hidden"
-            id="eventId"
-        >
-
-
-        <label>
-
-            <span data-i18n="eventName">
-                Event / Subject
-            </span>
-
-            <input
-                type="text"
-                id="titleInput"
-                placeholder="e.g. Lecture"
-                required
-                maxlength="80"
-            >
-
-        </label>
-
-
-        <label>
-
-            <span data-i18n="day">
-                Day
-            </span>
-
-            <select id="dayInput"></select>
-
-        </label>
-
-
-        <div class="two-columns">
-
-            <label>
-
-                <span data-i18n="start">
-                    Start
-                </span>
-
-                <input
-                    type="time"
-                    id="startInput"
-                    required
-                >
-
-            </label>
-
-
-            <label>
-
-                <span data-i18n="end">
-                    End
-                </span>
-
-                <input
-                    type="time"
-                    id="endInput"
-                    required
-                >
-
-            </label>
-
-        </div>
-
-
-        <label>
-
-            <span data-i18n="location">
-                Location
-            </span>
-
-            <input
-                type="text"
-                id="locationInput"
-                placeholder="e.g. Room 204"
-                maxlength="100"
-            >
-
-        </label>
-
-
-        <label>
-
-            <span data-i18n="notes">
-                Notes
-            </span>
-
-            <textarea
-                id="notesInput"
-                rows="3"
-                placeholder="Optional"
-                maxlength="250"
-            ></textarea>
-
-        </label>
-
-
-        <label>
-
-            <span data-i18n="color">
-                Color
-            </span>
-
-            <div
-                id="colorRow"
-                class="color-row"
-            ></div>
-
-        </label>
-
-
-        <div class="modal-actions">
-
-            <button
-                type="button"
-                id="deleteBtn"
-                class="delete-btn"
-            >
-                <span data-i18n="delete">
-                    Delete
-                </span>
-            </button>
-
-
-            <div>
-
-                <button
-                    type="button"
-                    id="cancelBtn"
-                    class="secondary-btn"
-                    data-i18n="cancel"
-                >
-                    Cancel
-                </button>
-
-
-                <button
-                    type="submit"
-                    class="primary-btn"
-                    data-i18n="save"
-                >
-                    Save
+                <button id="closeModalBtn" class="close-btn">
+                    ×
                 </button>
 
             </div>
 
+
+            <form id="eventForm">
+
+                <input type="hidden" id="eventId">
+
+
+                <!-- TITLE -->
+                <div class="form-group">
+
+                    <label for="eventTitle" id="titleLabel">
+                        Event / Class
+                    </label>
+
+                    <input
+                        type="text"
+                        id="eventTitle"
+                        placeholder="e.g. Web Development"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- DAY -->
+                <div class="form-group">
+
+                    <label for="eventDay" id="dayLabel">
+                        Day
+                    </label>
+
+                    <select id="eventDay" required>
+
+                        <option value="0">Monday</option>
+                        <option value="1">Tuesday</option>
+                        <option value="2">Wednesday</option>
+                        <option value="3">Thursday</option>
+                        <option value="4">Friday</option>
+                        <option value="5">Saturday</option>
+                        <option value="6">Sunday</option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- START / END -->
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="eventStart" id="startLabel">
+                            Start
+                        </label>
+
+                        <input
+                            type="time"
+                            id="eventStart"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="eventEnd" id="endLabel">
+                            End
+                        </label>
+
+                        <input
+                            type="time"
+                            id="eventEnd"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- LOCATION -->
+                <div class="form-group">
+
+                    <label for="eventLocation" id="locationLabel">
+                        Location
+                    </label>
+
+                    <input
+                        type="text"
+                        id="eventLocation"
+                        placeholder="e.g. Room 204"
+                    >
+
+                </div>
+
+
+                <!-- REPEAT -->
+                <div class="form-group">
+
+                    <label for="eventRepeat" id="repeatLabel">
+                        Repeat
+                    </label>
+
+                    <select id="eventRepeat">
+
+                        <option value="weekly">
+                            Every week
+                        </option>
+
+                        <option value="once">
+                            Once only
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- COLOR -->
+                <div class="form-group">
+
+                    <label for="eventColor" id="colorLabel">
+                        Colour
+                    </label>
+
+                    <input
+                        type="color"
+                        id="eventColor"
+                        value="#4f46e5"
+                    >
+
+                </div>
+
+
+                <!-- NOTES -->
+                <div class="form-group">
+
+                    <label for="eventNotes" id="notesLabel">
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="eventNotes"
+                        rows="3"
+                        placeholder="Optional notes..."
+                    ></textarea>
+
+                </div>
+
+
+                <!-- BUTTONS -->
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        id="deleteEventBtn"
+                        class="danger-btn hidden"
+                    >
+                        Delete
+                    </button>
+
+                    <div class="form-actions-right">
+
+                        <button
+                            type="button"
+                            id="cancelBtn"
+                            class="secondary-btn"
+                        >
+                            Cancel
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="primary-btn"
+                        >
+                            <span id="saveText">Save</span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
         </div>
 
-    </form>
-
-</div>
+    </div>
 
 
-<!-- MESSAGE -->
-
-<div
-    id="toast"
-    class="toast"
-></div>
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
 
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 
 </body>
-
 </html>
