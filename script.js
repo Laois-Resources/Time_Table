@@ -1124,3 +1124,692 @@ function openNewEvent(
 
 
     $("endInput").value =
+        minutesToTime(
+            endMinutes
+        );
+
+
+    selectedColor =
+        COLORS[0];
+
+
+    $("deleteBtn").style.display =
+        "none";
+
+
+    renderColors();
+
+
+    $("modalBackdrop")
+        .classList.add("open");
+
+
+    setTimeout(
+        () =>
+            $("titleInput").focus(),
+        100
+    );
+
+}
+
+
+/* =========================
+   EDIT EVENT
+========================= */
+
+function openEditEvent(id) {
+
+    const event =
+        events.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!event) return;
+
+
+    $("eventId").value =
+        event.id;
+
+
+    $("modalTitle").textContent =
+        t("editEvent");
+
+
+    $("titleInput").value =
+        event.title;
+
+
+    $("locationInput").value =
+        event.location || "";
+
+
+    $("startInput").value =
+        event.start;
+
+
+    $("endInput").value =
+        event.end;
+
+
+    $("notesInput").value =
+        event.notes || "";
+
+
+    const date =
+        new Date(
+            event.date
+            +
+            "T00:00:00"
+        );
+
+
+    let day =
+        date.getDay();
+
+
+    /*
+        JavaScript:
+        Sunday = 0
+        Monday = 1
+
+        Our schedule:
+        Monday = 0
+    */
+
+    day =
+        day === 0
+            ? 6
+            : day - 1;
+
+
+    $("dayInput").value =
+        day;
+
+
+    selectedColor =
+        event.color;
+
+
+    $("deleteBtn").style.display =
+        "block";
+
+
+    renderColors();
+
+
+    $("modalBackdrop")
+        .classList.add("open");
+
+}
+
+
+/* =========================
+   CLOSE MODAL
+========================= */
+
+function closeModal() {
+
+    $("modalBackdrop")
+        .classList.remove(
+            "open"
+        );
+
+}
+
+
+$("closeModal")
+    .addEventListener(
+        "click",
+        closeModal
+    );
+
+
+$("cancelBtn")
+    .addEventListener(
+        "click",
+        closeModal
+    );
+
+
+$("modalBackdrop")
+    .addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target
+                ===
+                $("modalBackdrop")
+            ) {
+
+                closeModal();
+
+            }
+
+        }
+    );
+
+
+/* =========================
+   SAVE EVENT
+========================= */
+
+$("eventForm")
+    .addEventListener(
+        "submit",
+        event => {
+
+            event.preventDefault();
+
+
+            const title =
+                $("titleInput")
+                    .value
+                    .trim();
+
+
+            const location =
+                $("locationInput")
+                    .value
+                    .trim();
+
+
+            const start =
+                $("startInput").value;
+
+
+            const end =
+                $("endInput").value;
+
+
+            const notes =
+                $("notesInput")
+                    .value
+                    .trim();
+
+
+            const dayIndex =
+                Number(
+                    $("dayInput").value
+                );
+
+
+            /* CHECK TIME */
+
+            if (
+                timeToMinutes(end)
+                <=
+                timeToMinutes(start)
+            ) {
+
+                showToast(
+                    t("invalidTime")
+                );
+
+                return;
+
+            }
+
+
+            /* DATE */
+
+            const weekStart =
+                getWeekStart();
+
+
+            const date =
+                new Date(
+                    weekStart
+                );
+
+
+            date.setDate(
+                date.getDate()
+                +
+                dayIndex
+            );
+
+
+            const newEvent = {
+
+                id:
+                    $("eventId").value
+                    ||
+                    crypto.randomUUID(),
+
+                title,
+
+                location,
+
+                start,
+
+                end,
+
+                notes,
+
+                date:
+                    dateKey(date),
+
+                color:
+                    selectedColor
+
+            };
+
+
+            /* =====================
+               CONFLICT CHECK
+            ===================== */
+
+            const conflict =
+                events.some(
+                    existing => {
+
+                        if (
+                            existing.id
+                            ===
+                            newEvent.id
+                        ) {
+
+                            return false;
+
+                        }
+
+
+                        if (
+                            existing.date
+                            !==
+                            newEvent.date
+                        ) {
+
+                            return false;
+
+                        }
+
+
+                        return (
+
+                            timeToMinutes(
+                                newEvent.start
+                            )
+                            <
+                            timeToMinutes(
+                                existing.end
+                            )
+
+                            &&
+
+                            timeToMinutes(
+                                newEvent.end
+                            )
+                            >
+                            timeToMinutes(
+                                existing.start
+                            )
+
+                        );
+
+                    }
+                );
+
+
+            if (conflict) {
+
+                const answer =
+                    confirm(
+                        t("conflict")
+                        +
+                        "\n\n"
+                        +
+                        (
+                            settings.language
+                            ===
+                            "ar"
+
+                                ?
+
+                                "هل تريد الحفظ على أي حال؟"
+
+                                :
+
+                                "Save anyway?"
+                        )
+                    );
+
+
+                if (!answer) {
+
+                    return;
+
+                }
+
+            }
+
+
+            /* =====================
+               SAVE
+            ===================== */
+
+            const existingIndex =
+                events.findIndex(
+                    item =>
+                        item.id
+                        ===
+                        newEvent.id
+                );
+
+
+            if (
+                existingIndex >= 0
+            ) {
+
+                events[
+                    existingIndex
+                ] =
+                    newEvent;
+
+            } else {
+
+                events.push(
+                    newEvent
+                );
+
+            }
+
+
+            saveEvents();
+
+            closeModal();
+
+            render();
+
+            showToast(
+                t("saved")
+            );
+
+        }
+    );
+
+
+/* =========================
+   DELETE
+========================= */
+
+$("deleteBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            const id =
+                $("eventId").value;
+
+
+            if (!id) return;
+
+
+            events =
+                events.filter(
+                    event =>
+                        event.id !== id
+                );
+
+
+            saveEvents();
+
+            closeModal();
+
+            render();
+
+            showToast(
+                t("deleted")
+            );
+
+        }
+    );
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+$("previousWeek")
+    .addEventListener(
+        "click",
+        () => {
+
+            weekOffset--;
+
+            render();
+
+        }
+    );
+
+
+$("nextWeek")
+    .addEventListener(
+        "click",
+        () => {
+
+            weekOffset++;
+
+            render();
+
+        }
+    );
+
+
+$("todayBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            weekOffset = 0;
+
+            render();
+
+        }
+    );
+
+
+/* =========================
+   ADD BUTTON
+========================= */
+
+$("addEventBtn")
+    .addEventListener(
+        "click",
+        () =>
+            openNewEvent()
+    );
+
+
+$("emptyAddBtn")
+    .addEventListener(
+        "click",
+        () =>
+            openNewEvent()
+    );
+
+
+/* =========================
+   LANGUAGE
+========================= */
+
+$("languageBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            settings.language =
+                settings.language === "en"
+                    ? "ar"
+                    : "en";
+
+
+            saveSettings();
+
+            applyLanguage();
+
+        }
+    );
+
+
+/* =========================
+   DARK MODE
+========================= */
+
+$("themeBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            settings.theme =
+                settings.theme === "dark"
+                    ? "light"
+                    : "dark";
+
+
+            saveSettings();
+
+            applyTheme();
+
+        }
+    );
+
+
+function applyTheme() {
+
+    document.documentElement
+        .dataset.theme =
+            settings.theme;
+
+}
+
+
+applyTheme();
+
+
+/* =========================
+   MINUTES → TIME
+========================= */
+
+function minutesToTime(minutes) {
+
+    const hours =
+        Math.floor(
+            minutes / 60
+        );
+
+
+    const mins =
+        minutes % 60;
+
+
+    return (
+
+        String(hours)
+            .padStart(2, "0")
+
+        +
+
+        ":"
+
+        +
+
+        String(mins)
+            .padStart(2, "0")
+
+    );
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHTML(value = "") {
+
+    return value.replace(
+        /[&<>"']/g,
+        character => {
+
+            const characters = {
+
+                "&": "&amp;",
+
+                "<": "&lt;",
+
+                ">": "&gt;",
+
+                '"': "&quot;",
+
+                "'": "&#039;"
+
+            };
+
+
+            return characters[
+                character
+            ];
+
+        }
+    );
+
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+function showToast(message) {
+
+    const toast =
+        $("toast");
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        window.toastTimer
+    );
+
+
+    window.toastTimer =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+
+            2200
+        );
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+renderDaySelect();
+
+renderColors();
+
+applyLanguage();
+
+applyTheme();
+
+render();
