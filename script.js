@@ -1,6 +1,6 @@
 /* =========================================
    WEEKLY PLANNER
-   Table + LocalStorage + Repeat
+   Table + LocalStorage (Daily Schedule)
 ========================================= */
 
 
@@ -25,8 +25,6 @@ let currentLanguage = "en";
 
 let darkMode = false;
 
-let weekOffset = 0;
-
 
 /* =========================================
    TRANSLATIONS
@@ -43,14 +41,6 @@ const translations = {
 
         add: "Add",
 
-        previous: "← Previous",
-
-        today: "Today",
-
-        next: "Next →",
-
-        thisWeek: "This Week",
-
         day: "Day",
 
         task: "What to do",
@@ -58,8 +48,6 @@ const translations = {
         time: "Time",
 
         location: "Location",
-
-        repeat: "Repeat",
 
         notes: "Notes",
 
@@ -82,12 +70,6 @@ const translations = {
 
         endTime:
             "End time",
-
-        everyWeek:
-            "Every week",
-
-        once:
-            "Once only",
 
         optional:
             "Optional notes...",
@@ -139,18 +121,6 @@ const translations = {
         add:
             "إضافة",
 
-        previous:
-            "← السابق",
-
-        today:
-            "اليوم",
-
-        next:
-            "التالي →",
-
-        thisWeek:
-            "هذا الأسبوع",
-
         day:
             "اليوم",
 
@@ -162,9 +132,6 @@ const translations = {
 
         location:
             "الموقع",
-
-        repeat:
-            "التكرار",
 
         notes:
             "ملاحظات",
@@ -189,12 +156,6 @@ const translations = {
 
         endTime:
             "وقت النهاية",
-
-        everyWeek:
-            "كل أسبوع",
-
-        once:
-            "مرة واحدة",
 
         optional:
             "ملاحظات اختيارية...",
@@ -319,11 +280,6 @@ const taskLocation =
         "taskLocation"
     );
 
-const taskRepeat =
-    document.getElementById(
-        "taskRepeat"
-    );
-
 const taskNotes =
     document.getElementById(
         "taskNotes"
@@ -339,11 +295,6 @@ const deleteBtn =
         "deleteBtn"
     );
 
-const weekLabel =
-    document.getElementById(
-        "weekLabel"
-    );
-
 const toast =
     document.getElementById(
         "toast"
@@ -351,10 +302,66 @@ const toast =
 
 
 /* =========================================
+   GENERATE 15-MIN TIME OPTIONS
+========================================= */
+
+function populateTimeOptions() {
+
+    taskStart.innerHTML = "";
+
+    taskEnd.innerHTML = "";
+
+
+    for (let hour = 0; hour < 24; hour++) {
+
+        for (let min = 0; min < 60; min += 15) {
+
+            const hh =
+                String(hour).padStart(2, "0");
+
+            const mm =
+                String(min).padStart(2, "0");
+
+            const timeValue =
+                `${hh}:${mm}`;
+
+
+            const startOption =
+                document.createElement("option");
+
+            startOption.value =
+                timeValue;
+
+            startOption.textContent =
+                timeValue;
+
+
+            const endOption =
+                document.createElement("option");
+
+            endOption.value =
+                timeValue;
+
+            endOption.textContent =
+                timeValue;
+
+
+            taskStart.appendChild(startOption);
+
+            taskEnd.appendChild(endOption);
+        }
+    }
+}
+
+
+/* =========================================
    LOAD
 ========================================= */
 
 function loadData() {
+
+    populateTimeOptions();
+
 
     try {
 
@@ -484,24 +491,6 @@ function applySettings() {
 
 
     document.getElementById(
-        "previousWeekBtn"
-    ).textContent =
-        t.previous;
-
-
-    document.getElementById(
-        "todayBtn"
-    ).textContent =
-        t.today;
-
-
-    document.getElementById(
-        "nextWeekBtn"
-    ).textContent =
-        t.next;
-
-
-    document.getElementById(
         "languageBtn"
     ).textContent =
         currentLanguage === "en"
@@ -520,8 +509,6 @@ function applySettings() {
     updateTableHeaders();
 
     updateFormText();
-
-    updateWeekLabel();
 
     renderTable();
 }
@@ -557,12 +544,9 @@ function updateTableHeaders() {
         t.location;
 
     headers[4].textContent =
-        t.repeat;
-
-    headers[5].textContent =
         t.notes;
 
-    headers[6].textContent =
+    headers[5].textContent =
         t.actions;
 }
 
@@ -610,12 +594,6 @@ function updateFormText() {
 
 
     document.querySelector(
-        'label[for="taskRepeat"]'
-    ).textContent =
-        t.repeat;
-
-
-    document.querySelector(
         'label[for="taskNotes"]'
     ).textContent =
         t.notes;
@@ -646,8 +624,6 @@ function updateFormText() {
 
 
     updateDayOptions();
-
-    updateRepeatOptions();
 }
 
 
@@ -693,275 +669,6 @@ function updateDayOptions() {
 }
 
 
-function updateRepeatOptions() {
-
-    const current =
-        taskRepeat.value || "weekly";
-
-    const t =
-        translations[
-            currentLanguage
-        ];
-
-
-    taskRepeat.innerHTML = "";
-
-
-    const weekly =
-        document.createElement(
-            "option"
-        );
-
-    weekly.value =
-        "weekly";
-
-    weekly.textContent =
-        t.everyWeek;
-
-
-    const once =
-        document.createElement(
-            "option"
-        );
-
-    once.value =
-        "once";
-
-    once.textContent =
-        t.once;
-
-
-    taskRepeat.appendChild(
-        weekly
-    );
-
-    taskRepeat.appendChild(
-        once
-    );
-
-
-    taskRepeat.value =
-        current;
-}
-
-
-/* =========================================
-   DATE HELPERS
-========================================= */
-
-function getMonday(date) {
-
-    const result =
-        new Date(date);
-
-    const day =
-        result.getDay();
-
-
-    const difference =
-        day === 0
-            ? -6
-            : 1 - day;
-
-
-    result.setDate(
-        result.getDate() +
-        difference
-    );
-
-
-    result.setHours(
-        0,
-        0,
-        0,
-        0
-    );
-
-
-    return result;
-}
-
-
-function getCurrentWeekStart() {
-
-    const monday =
-        getMonday(
-            new Date()
-        );
-
-
-    monday.setDate(
-        monday.getDate() +
-        weekOffset * 7
-    );
-
-
-    return monday;
-}
-
-
-function dateToString(date) {
-
-    const year =
-        date.getFullYear();
-
-    const month =
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0");
-
-    const day =
-        String(
-            date.getDate()
-        ).padStart(2, "0");
-
-
-    return `${year}-${month}-${day}`;
-}
-
-
-/* =========================================
-   WEEK LABEL
-========================================= */
-
-function updateWeekLabel() {
-
-    const t =
-        translations[
-            currentLanguage
-        ];
-
-
-    if (weekOffset === 0) {
-
-        weekLabel.textContent =
-            t.thisWeek;
-
-        return;
-    }
-
-
-    const start =
-        getCurrentWeekStart();
-
-
-    const end =
-        new Date(start);
-
-
-    end.setDate(
-        end.getDate() + 6
-    );
-
-
-    const options = {
-
-        day: "numeric",
-
-        month: "short",
-
-        year: "numeric"
-
-    };
-
-
-    const startText =
-        start.toLocaleDateString(
-            currentLanguage === "ar"
-                ? "ar-IQ"
-                : "en-IE",
-            options
-        );
-
-
-    const endText =
-        end.toLocaleDateString(
-            currentLanguage === "ar"
-                ? "ar-IQ"
-                : "en-IE",
-            options
-        );
-
-
-    weekLabel.textContent =
-        `${startText} - ${endText}`;
-}
-
-
-/* =========================================
-   VISIBLE TASKS
-========================================= */
-
-function getVisibleTasks() {
-
-    const weekStart =
-        getCurrentWeekStart();
-
-
-    const weekStartString =
-        dateToString(
-            weekStart
-        );
-
-
-    const weekEnd =
-        new Date(weekStart);
-
-
-    weekEnd.setDate(
-        weekEnd.getDate() + 6
-    );
-
-
-    const weekEndString =
-        dateToString(
-            weekEnd
-        );
-
-
-    return tasks.filter(
-        task => {
-
-            /*
-               WEEKLY:
-               Always appears on its
-               selected weekday.
-            */
-
-            if (
-                task.repeat === "weekly"
-            ) {
-
-                return true;
-            }
-
-
-            /*
-               ONCE:
-               Only appears during the
-               week it was created.
-            */
-
-            if (
-                task.repeat === "once"
-            ) {
-
-                return (
-                    task.date >=
-                    weekStartString &&
-
-                    task.date <=
-                    weekEndString
-                );
-            }
-
-
-            return false;
-        }
-    );
-}
-
-
 /* =========================================
    SORT
 ========================================= */
@@ -1001,19 +708,17 @@ function renderTable() {
     tableBody.innerHTML = "";
 
 
-    const visibleTasks =
-        sortTasks(
-            getVisibleTasks()
-        );
+    const sortedTasks =
+        sortTasks(tasks);
 
 
     emptyMessage.classList.toggle(
         "hidden",
-        visibleTasks.length > 0
+        sortedTasks.length > 0
     );
 
 
-    visibleTasks.forEach(
+    sortedTasks.forEach(
         task => {
 
             const row =
@@ -1083,41 +788,6 @@ function renderTable() {
             locationCell.textContent =
                 task.location ||
                 "—";
-
-
-            /* REPEAT */
-
-            const repeatCell =
-                document.createElement(
-                    "td"
-                );
-
-
-            const repeatBadge =
-                document.createElement(
-                    "span"
-                );
-
-
-            repeatBadge.className =
-                task.repeat === "weekly"
-                    ? "repeat-badge repeat-weekly"
-                    : "repeat-badge repeat-once";
-
-
-            repeatBadge.textContent =
-                task.repeat === "weekly"
-                    ? translations[
-                        currentLanguage
-                      ].everyWeek
-                    : translations[
-                        currentLanguage
-                      ].once;
-
-
-            repeatCell.appendChild(
-                repeatBadge
-            );
 
 
             /* NOTES */
@@ -1233,10 +903,6 @@ function renderTable() {
             );
 
             row.appendChild(
-                repeatCell
-            );
-
-            row.appendChild(
                 notesCell
             );
 
@@ -1314,8 +980,9 @@ function openAddModal() {
 
     taskDay.value = "0";
 
-    taskRepeat.value =
-        "weekly";
+    taskStart.value = "09:00";
+
+    taskEnd.value = "09:15";
 
 
     modalTitle.textContent =
@@ -1377,9 +1044,6 @@ function openEditModal(id) {
 
     taskLocation.value =
         task.location || "";
-
-    taskRepeat.value =
-        task.repeat;
 
     taskNotes.value =
         task.notes || "";
@@ -1458,35 +1122,6 @@ function hasConflict(
             }
 
 
-            /*
-               Two weekly tasks conflict
-               with each other.
-
-               Once-only tasks only conflict
-               if they are on the same date.
-            */
-
-            if (
-                newTask.repeat === "once" &&
-                task.repeat === "once"
-            ) {
-
-                if (
-                    task.date !==
-                    newTask.date
-                ) {
-
-                    return false;
-                }
-            }
-
-
-            /*
-               A weekly task and a once-only
-               task on the same day/time
-               also conflict.
-            */
-
             const existingStart =
                 timeToMinutes(
                     task.start
@@ -1525,9 +1160,15 @@ form.addEventListener(
             taskEnd.value;
 
 
+        const startMinutes =
+            timeToMinutes(start);
+
+        const endMinutes =
+            timeToMinutes(end);
+
+
         if (
-            timeToMinutes(end) <=
-            timeToMinutes(start)
+            endMinutes <= startMinutes
         ) {
 
             showToast(
@@ -1543,59 +1184,6 @@ form.addEventListener(
         const id =
             taskId.value ||
             generateId();
-
-
-        /*
-           WEEKLY TASK
-           ----------------
-           We store the weekday.
-
-           Example:
-
-           Monday = 0
-
-           This means it will appear
-           every Monday automatically.
-        */
-
-
-        /*
-           ONCE TASK
-           ----------------
-           We store an actual date.
-        */
-
-        let date = null;
-
-
-        if (
-            taskRepeat.value ===
-            "once"
-        ) {
-
-            const weekStart =
-                getCurrentWeekStart();
-
-
-            const selectedDate =
-                new Date(
-                    weekStart
-                );
-
-
-            selectedDate.setDate(
-                selectedDate.getDate() +
-                Number(
-                    taskDay.value
-                )
-            );
-
-
-            date =
-                dateToString(
-                    selectedDate
-                );
-        }
 
 
         const newTask = {
@@ -1619,14 +1207,8 @@ form.addEventListener(
             location:
                 taskLocation.value.trim(),
 
-            repeat:
-                taskRepeat.value,
-
             notes:
-                taskNotes.value.trim(),
-
-            date:
-                date
+                taskNotes.value.trim()
         };
 
 
@@ -1834,61 +1416,6 @@ document
             saveSettings();
 
             applySettings();
-        }
-    );
-
-
-/* =========================================
-   WEEK NAVIGATION
-========================================= */
-
-document
-    .getElementById(
-        "previousWeekBtn"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            weekOffset--;
-
-            updateWeekLabel();
-
-            renderTable();
-        }
-    );
-
-
-document
-    .getElementById(
-        "nextWeekBtn"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            weekOffset++;
-
-            updateWeekLabel();
-
-            renderTable();
-        }
-    );
-
-
-document
-    .getElementById(
-        "todayBtn"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            weekOffset = 0;
-
-            updateWeekLabel();
-
-            renderTable();
         }
     );
 
