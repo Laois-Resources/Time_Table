@@ -43,28 +43,6 @@
     </header>
 
 
-    <!-- WEEK NAVIGATION -->
-    <section class="week-bar">
-
-        <button id="previousWeekBtn" class="secondary-btn">
-            ← Previous
-        </button>
-
-        <button id="todayBtn" class="secondary-btn">
-            Today
-        </button>
-
-        <div id="weekLabel" class="week-label">
-            This Week
-        </div>
-
-        <button id="nextWeekBtn" class="secondary-btn">
-            Next →
-        </button>
-
-    </section>
-
-
     <!-- TABLE -->
     <section class="table-container">
 
@@ -83,8 +61,6 @@
                         <th>Time</th>
 
                         <th>Location</th>
-
-                        <th>Repeat</th>
 
                         <th>Notes</th>
 
@@ -189,11 +165,12 @@
                         Start time
                     </label>
 
-                    <input
-                        type="time"
+                    <select
                         id="taskStart"
                         required
                     >
+                        <!-- JavaScript populates 15-min options -->
+                    </select>
 
                 </div>
 
@@ -204,11 +181,12 @@
                         End time
                     </label>
 
-                    <input
-                        type="time"
+                    <select
                         id="taskEnd"
                         required
                     >
+                        <!-- JavaScript populates 15-min options -->
+                    </select>
 
                 </div>
 
@@ -228,29 +206,6 @@
                     id="taskLocation"
                     placeholder="e.g. Room 204"
                 >
-
-            </div>
-
-
-            <!-- REPEAT -->
-
-            <div class="form-group">
-
-                <label for="taskRepeat">
-                    Repeat
-                </label>
-
-                <select id="taskRepeat">
-
-                    <option value="weekly">
-                        Every week
-                    </option>
-
-                    <option value="once">
-                        Once only
-                    </option>
-
-                </select>
 
             </div>
 
