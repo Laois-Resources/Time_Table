@@ -639,6 +639,13 @@ function updateDayOptions() {
     taskDay.innerHTML = "";
 
 
+    // General / No Day option added here
+    const generalOption = document.createElement("option");
+    generalOption.value = "";
+    generalOption.textContent = currentLanguage === "ar" ? "عام / بدون يوم" : "General / No Day";
+    taskDay.appendChild(generalOption);
+
+
     days[currentLanguage]
         .forEach(
             (day, index) => {
@@ -661,7 +668,7 @@ function updateDayOptions() {
         );
 
 
-    if (current !== "") {
+    if (current !== undefined) {
 
         taskDay.value =
             current;
@@ -678,15 +685,20 @@ function sortTasks(list) {
     return [...list].sort(
         (a, b) => {
 
-            if (
-                a.dayIndex !==
-                b.dayIndex
-            ) {
+            const aDay =
+                a.dayIndex === "" || a.dayIndex === undefined
+                    ? -1
+                    : Number(a.dayIndex);
 
-                return (
-                    a.dayIndex -
-                    b.dayIndex
-                );
+            const bDay =
+                b.dayIndex === "" || b.dayIndex === undefined
+                    ? -1
+                    : Number(b.dayIndex);
+
+
+            if (aDay !== bDay) {
+
+                return aDay - bDay;
             }
 
 
@@ -737,12 +749,26 @@ function renderTable() {
             dayCell.className =
                 "day-cell";
 
-            dayCell.textContent =
-                days[
-                    currentLanguage
-                ][
-                    task.dayIndex
-                ];
+
+            if (
+                task.dayIndex === "" ||
+                task.dayIndex === undefined
+            ) {
+
+                dayCell.textContent =
+                    currentLanguage === "ar"
+                        ? "عام"
+                        : "General";
+
+            } else {
+
+                dayCell.textContent =
+                    days[
+                        currentLanguage
+                    ][
+                        task.dayIndex
+                    ];
+            }
 
 
             /* TASK */
@@ -978,7 +1004,7 @@ function openAddModal() {
 
     taskId.value = "";
 
-    taskDay.value = "0";
+    taskDay.value = ""; // Defaults to General / No Day option
 
     taskStart.value = "09:00";
 
@@ -1031,7 +1057,7 @@ function openEditModal(id) {
         task.id;
 
     taskDay.value =
-        task.dayIndex;
+        task.dayIndex !== undefined ? task.dayIndex : "";
 
     taskTitle.value =
         task.title;
@@ -1074,70 +1100,6 @@ function closeModal() {
 
     modal.classList.add(
         "hidden"
-    );
-}
-
-
-/* =========================================
-   CONFLICT
-========================================= */
-
-function hasConflict(
-    newTask,
-    ignoreId = null
-) {
-
-    const newStart =
-        timeToMinutes(
-            newTask.start
-        );
-
-    const newEnd =
-        timeToMinutes(
-            newTask.end
-        );
-
-
-    return tasks.some(
-        task => {
-
-            if (
-                task.id === ignoreId
-            ) {
-
-                return false;
-            }
-
-
-            if (
-                Number(
-                    task.dayIndex
-                ) !==
-                Number(
-                    newTask.dayIndex
-                )
-            ) {
-
-                return false;
-            }
-
-
-            const existingStart =
-                timeToMinutes(
-                    task.start
-                );
-
-            const existingEnd =
-                timeToMinutes(
-                    task.end
-                );
-
-
-            return (
-                newStart < existingEnd &&
-                newEnd > existingStart
-            );
-        }
     );
 }
 
@@ -1191,9 +1153,11 @@ form.addEventListener(
             id: id,
 
             dayIndex:
-                Number(
-                    taskDay.value
-                ),
+                taskDay.value === ""
+                    ? ""
+                    : Number(
+                        taskDay.value
+                    ),
 
             title:
                 taskTitle.value.trim(),
@@ -1212,21 +1176,7 @@ form.addEventListener(
         };
 
 
-        if (
-            hasConflict(
-                newTask,
-                taskId.value || null
-            )
-        ) {
-
-            showToast(
-                translations[
-                    currentLanguage
-                ].conflict
-            );
-
-            return;
-        }
+        // Overlap validation check removed so overlapping times are allowed.
 
 
         const existingIndex =
